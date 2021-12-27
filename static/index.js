@@ -45,10 +45,6 @@
 
     socket.on('data', (data) => {
       console.log('Data received:', data);
-      handleSignalingData(data);
-    });
-
-    function handleSignalingData(data) {
       switch (data.type) {
         case 'offer':
           createPeerConnection();
@@ -58,10 +54,12 @@
         case 'answer':
           pc.setRemoteDescription(new RTCSessionDescription(data));
         case 'candidate':
-          pc.addIceCandidate(new RTCIceCandidate(data.candidate));
+          if (data.candidate) {
+            pc.addIceCandidate(new RTCIceCandidate(data.candidate));
+          }
           break;
       }
-    }
+    });
 
     socket.on('ready', () => {
       console.log('Ready');
