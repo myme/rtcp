@@ -48,14 +48,14 @@
       switch (data.type) {
         case 'offer':
           createPeerConnection();
-          pc.setRemoteDescription(new RTCSessionDescription(data));
+          pc.setRemoteDescription(data);
           sendAnswer();
           break;
         case 'answer':
-          pc.setRemoteDescription(new RTCSessionDescription(data));
+          pc.setRemoteDescription(data);
         case 'candidate':
           if (data.candidate) {
-            pc.addIceCandidate(new RTCIceCandidate(data.candidate));
+            pc.addIceCandidate(data.candidate);
           }
           break;
       }
