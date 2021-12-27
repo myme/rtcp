@@ -9,8 +9,6 @@ sio = socketio.AsyncServer(cors_allowed_origins='*')
 app = web.Application()
 sio.attach(app)
 
-app.add_routes([web.static('/', 'static', show_index=True)])
-
 
 @sio.event
 async def connect(sid, environ):
