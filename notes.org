@@ -1,0 +1,53 @@
+#+TITLE: WebRTC notes
+
+* Network setup (NAT, ICE, STUN)
+
+** ICE
+
+*** [[https://en.wikipedia.org/wiki/Interactive_Connectivity_Establishment][Interactive Connectivity Establishment (Wikipedia)]]
+
+#+begin_quote
+Interactive Connectivity Establishment (ICE) is a technique used in computer
+networking to find ways for two computers to talk to each other as directly as
+possible in peer-to-peer networking.
+#+end_quote
+
+** STUN - NAT traversal
+
+*** [[https://en.wikipedia.org/wiki/STUN][STUN (Wikipedia)]]
+
+#+begin_quote
+Session Traversal Utilities for NAT (STUN) is a standardized set of methods,
+including a network protocol, for traversal of network address translator (NAT)
+gateways in applications of real-time voice, video, messaging, and other
+interactive communications.
+#+end_quote
+
+*** [[https://medium.com/av-transcode/what-is-webrtc-and-how-to-setup-stun-turn-server-for-webrtc-communication-63314728b9d0][What is WebRTC and How to Setup STUN/TURN Server for WebRTC Communication?]]
+
+** TURN
+
+*** [[https://en.wikipedia.org/wiki/Traversal_Using_Relays_around_NAT][Traversal Using Relays around NAT (Wikipedia)]]
+
+#+begin_quote
+Traversal Using Relays around NAT (TURN) is a protocol that assists in traversal
+of network address translators (NAT) or firewalls for multimedia applications.
+#+end_quote
+
+*** [[https://github.com/coturn/coturn][coturn - Free open source implementation of TURN and STUN Server]]
+
+* Signalling
+* WebRTC
+
+** Connection
+
+*** [[https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API/Perfect_negotiation][Establishing a connection: The WebRTC perfect negotiation pattern]]
+
+** Data channel
+
+*** [[https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API/Simple_RTCDataChannel_sample][A simple RTCDataChannel sample]] :tutorial:
+
+* Tutorials
+
+** [[https://pfertyk.me/2020/03/webrtc-a-working-example/][WebRTC: a working example]] :tutorial:
+** [[https://codelabs.developers.google.com/codelabs/webrtc-web/#6][Real time communication with WebRTC]] :tutorial:
