@@ -8,6 +8,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="apple-touch-icon" href="/apple-touch-icon.png">
         <!-- Place favicon.ico in the root directory -->
+        <script src="./socket.io.min.js"></script>
         <script src="./index.js"></script>
         <style>
             pre {
@@ -21,17 +22,8 @@
         </style>
     </head>
     <body>
-        Send status: <span id="send-connection-status">Disconnected</span>,
-        Receive status: <span id="receive-connection-status">Disconnected</span>
-        <h2>Client 1</h2>
-        <form id="client1">
-            <pre></pre>
-            <input type="text" />
-            <button type="submit">Send</button>
-        </form>
-
-        <h2>Client 2</h2>
-        <form id="client2">
+        <form id="client">
+            Status: <span class="status">Disconnected</span>,
             <pre></pre>
             <input type="text" />
             <button type="submit">Send</button>
