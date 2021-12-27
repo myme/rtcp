@@ -6,7 +6,7 @@
 
   function setupSendMessageHandler(client, channel) {
     const formEl = document.getElementById(client);
-    formEl.addEventListener('submit', (event) => {
+    const handler = (event) => {
       console.log('submit');
       event.preventDefault();
 
@@ -23,7 +23,9 @@
 
       const messagesArea = formEl.querySelector('pre');
       messagesArea.appendChild(messageEl);
-    });
+    };
+    formEl.addEventListener('submit', handler);
+    return handler;
   }
 
   const handleChannelStatusChange = (client, channel) => () => {
@@ -95,8 +97,16 @@
       channel.onmessage = (event) => { handleMessage('client', event) };
       const statusChangeHandler = handleChannelStatusChange('client', channel);
       channel.onopen = statusChangeHandler;
-      channel.onclose = statusChangeHandler;
-      setupSendMessageHandler('client', channel);
+      let handler;
+      channel.onclose = () => {
+        statusChangeHandler();
+        console.log('Closing Peer Connection');
+        pc.close();
+        pc = null;
+        const formEl = document.getElementById('client');
+        formEl.removeEventListener('submit', handler);
+      };
+      handler = setupSendMessageHandler('client', channel);
     }
 
     function onIceCandidate(event) {
