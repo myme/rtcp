@@ -1,4 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+
+import logo from '../favicon.svg';
 import Form from './Form';
 import connectSocket, { Socket } from './socket';
 
@@ -7,7 +10,7 @@ interface Message {
   text: string,
 }
 
-export default function Share() {
+export default function Share(): JSX.Element {
   const [socket, setSocket] = useState<Socket>();
   const [connected, setConnected] = useState(false);
   const [messages, setMessages] = useState<Array<Message>>([]);
@@ -34,6 +37,12 @@ export default function Share() {
 
   return (
     <>
+      <h3>
+        <Link to="/">
+          <img src={logo} height="30px" className="App-logo" alt="logo" />
+        </Link>
+        xchg
+      </h3>
       Status: <span className="status">{connected ? 'Connected' : 'Disconnected'}</span>
       <Form onSubmit={submit} />
       <pre>
