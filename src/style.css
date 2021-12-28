@@ -8,6 +8,7 @@
 }
 
 pre {
+  text-align: left;
   border: 1px solid black;
   height: 10em;
   margin-left: auto;
