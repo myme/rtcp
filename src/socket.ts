@@ -22,29 +22,7 @@ export class Socket {
 
     this.socket.on('data', (data) => {
       console.log('Data received:', data);
-      switch (data.type) {
-        case 'offer':
-          this.createPeerConnection();
-          if (!this.pc) {
-            throw new Error('No peer connection');
-          }
-          this.pc.setRemoteDescription(data);
-          this.sendAnswer();
-          break;
-        case 'answer':
-          if (!this.pc) {
-            throw new Error('No peer connection');
-          }
-          this.pc.setRemoteDescription(data);
-        case 'candidate':
-          if (!this.pc) {
-            throw new Error('No peer connection');
-          }
-          if (data.candidate) {
-            this.pc.addIceCandidate(data.candidate);
-          }
-          break;
-      }
+      this.handleMessage(data);
     });
 
     this.socket.on('ready', () => {
@@ -73,6 +51,32 @@ export class Socket {
       console.log('Peer connection created');
     } catch (error) {
       console.error('Peer connection failed:', error);
+    }
+  }
+
+  handleMessage(message: any) {
+    switch (message.type) {
+      case 'offer':
+        this.createPeerConnection();
+        if (!this.pc) {
+          throw new Error('No peer connection');
+        }
+        this.pc.setRemoteDescription(message);
+        this.sendAnswer();
+        break;
+      case 'answer':
+        if (!this.pc) {
+          throw new Error('No peer connection');
+        }
+        this.pc.setRemoteDescription(message);
+      case 'candidate':
+        if (!this.pc) {
+          throw new Error('No peer connection');
+        }
+        if (message.candidate) {
+          this.pc.addIceCandidate(message.candidate);
+        }
+        break;
     }
   }
 

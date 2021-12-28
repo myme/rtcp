@@ -37,10 +37,10 @@ export default function App() {
     <>
       <h1>xchg</h1>
       Status: <span className="status">{connected ? 'Connected' : 'Disconnected'}</span>
+      <Form onSubmit={submit} />
       <pre>
         {messages.map(({ direction, text }) => `${direction} ${text}`).join('\n')}
       </pre>
-      <Form onSubmit={submit} />
     </>
   );
 }
