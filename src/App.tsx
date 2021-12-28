@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import logo from '../favicon.svg';
 import './style.css';
 import Form from './Form';
 import connectSocket, { Socket } from './socket';
@@ -35,7 +36,10 @@ export default function App() {
 
   return (
     <>
-      <h1>xchg</h1>
+      <h1>
+        <img src={logo} height="30px" className="App-logo" alt="logo" />
+        xchg
+      </h1>
       Status: <span className="status">{connected ? 'Connected' : 'Disconnected'}</span>
       <Form onSubmit={submit} />
       <pre>
