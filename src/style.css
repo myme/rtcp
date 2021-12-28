@@ -16,13 +16,26 @@ h1 img, h3 img {
   margin-bottom: -0.15em;
 }
 
+h1 {
+  font-size: 40px;
+}
+
 a {
   text-decoration: none;
 }
 
+button, input {
+  border-style: solid;
+  border-radius: 0.5em;
+  padding: 10px;
+}
+
 pre {
   text-align: left;
-  border: 1px solid black;
+  border-width: 0.1em;
+  border-color: #e0e0e0;
+  border-style: solid;
+  border-radius: 0.5em;
   height: 10em;
   margin-left: auto;
   margin-right: auto;

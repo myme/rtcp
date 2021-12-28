@@ -1,20 +1,20 @@
-import React from 'react';
-import { Link } from "react-router-dom";
+import React, { useCallback } from 'react';
+import { useNavigate } from "react-router-dom";
 
 import logo from '../favicon.svg';
 
 export default function Start() {
+  const navigate = useNavigate();
+
+  const startShare = useCallback(() => {
+    navigate('/share');
+  }, []);
+
   return (
     <>
-      <h1>
-        <Link to="/">
-          <img src={logo} height="30px" className="App-logo" alt="logo" />
-        </Link>
-        xchg
-      </h1>
-      <Link to="/share">
-        {'Start a new share'}
-      </Link>
+      <img src={logo} height="60px" className="App-logo" alt="logo" />
+      <h1>xchg</h1>
+      <button onClick={startShare}>Start a new share</button>
     </>
   );
 }
