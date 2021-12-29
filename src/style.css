@@ -24,7 +24,7 @@ a {
   text-decoration: none;
 }
 
-button, input {
+button, input, select {
   border-style: solid;
   border-radius: 0.5em;
   padding: 10px;

@@ -2,26 +2,34 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import logo from '../favicon.svg';
-import Form from './Form';
+import Form, { Item } from './Form';
 import connectSocket, { Socket } from './socket';
 
-interface Message {
+interface Share {
   direction: '>' | '<',
-  text: string,
+  item: Item,
+}
+
+function Item(props: { item: Item }) {
+  const { item: { type, value } } = props;
+  const output = type === 'hidden' ? value.replace(/./g, '*') : value;
+  return (
+    <span>{output}</span>
+  );
 }
 
 export default function Share(): JSX.Element {
   const [socket, setSocket] = useState<Socket>();
   const [connected, setConnected] = useState(false);
-  const [messages, setMessages] = useState<Array<Message>>([]);
+  const [shares, setShares] = useState<Array<Share>>([]);
 
-  const submit = useCallback((value) => {
-    setMessages(m => m.concat({ direction: '>', text: value }));
+  const submit = useCallback<(item: Item) => void>((item) => {
+    setShares(m => m.concat({ direction: '>', item }));
     if (!socket) {
       throw new Error('Socket not initialized');
     }
-    socket.send(value);
-  }, [setMessages, socket]);
+    socket.send(JSON.stringify(item));
+  }, [setShares, socket]);
 
   useEffect(() => {
     const socket = connectSocket({
@@ -29,7 +37,8 @@ export default function Share(): JSX.Element {
         setConnected(state === 'connected');
       },
       onMessage(message) {
-        setMessages(m => m.concat({ direction: '<', text: message }));
+        const item = JSON.parse(message);
+        setShares(m => m.concat({ direction: '<', item }));
       },
     });
     setSocket(socket);
@@ -46,7 +55,13 @@ export default function Share(): JSX.Element {
       Status: <span className="status">{connected ? 'Connected' : 'Disconnected'}</span>
       <Form onSubmit={submit} />
       <pre>
-        {messages.map(({ direction, text }) => `${direction} ${text}`).join('\n')}
+        {shares.map(({ direction, item }, idx) => (
+          <p key={idx}>
+            {direction}
+            {' '}
+            <Item key={idx} item={item} />
+          </p>
+        ))}
       </pre>
     </>
   );
