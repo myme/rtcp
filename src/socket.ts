@@ -1,4 +1,5 @@
 import io from 'socket.io-client';
+import { Item } from './Form';
 
 const SIGNALING_SERVER_URL = 'http://localhost:9999';
 const PC_CONFIG = {};
@@ -7,7 +8,7 @@ export type ConnectionState = 'connected' | 'disconnected';
 
 export interface Props {
   onConnectionStateChange: (state: ConnectionState) => void,
-  onMessage: (data: any) => void,
+  onItem: (item: Item) => void,
 }
 
 export class Socket {
@@ -90,7 +91,9 @@ export class Socket {
   setDataChannel(channel: RTCDataChannel) {
     console.log('setDataChannel()');
     this.channel = channel;
-    this.channel.onmessage = (event) => { this.props.onMessage(event.data); };
+    this.channel.onmessage = (event) => {
+      this.props.onItem(JSON.parse(event.data));
+    };
     this.channel.onopen = () => { this.props.onConnectionStateChange('connected'); };
     this.channel.onclose = () => {
       this.props.onConnectionStateChange('disconnected');

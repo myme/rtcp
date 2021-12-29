@@ -36,8 +36,7 @@ export default function Share(): JSX.Element {
       onConnectionStateChange(state) {
         setConnected(state === 'connected');
       },
-      onMessage(message) {
-        const item = JSON.parse(message);
+      onItem(item) {
         setShares(m => m.concat({ direction: '<', item }));
       },
     });
