@@ -25,6 +25,7 @@ a {
 }
 
 button, input, select {
+  border-color: #e0e0e0;
   border-style: solid;
   border-radius: 0.5em;
   padding: 10px;
