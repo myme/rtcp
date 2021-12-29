@@ -131,7 +131,7 @@ export class Socket {
 
   send(message: any) {
     if (this.channel) {
-        this.channel.send(message);
+      this.channel.send(message);
     }
   }
 

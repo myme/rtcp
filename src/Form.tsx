@@ -30,9 +30,9 @@ export default function Form(props: Props): JSX.Element {
   const typeChange: React.ChangeEventHandler<HTMLSelectElement> = useCallback((event) => {
     const value = event.target.value.toLowerCase();
     switch (value) {
-    case 'text':
-    case 'hidden':
-    case 'file':
+      case 'text':
+      case 'hidden':
+      case 'file':
         setType(value);
     }
   }, [setType]);
