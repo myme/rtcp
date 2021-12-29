@@ -37,6 +37,13 @@ export class Socket {
     this.socket.connect();
   }
 
+  close() {
+    if (this.channel) {
+      this.channel.close;
+    }
+    this.socket.close();
+  }
+
   createPeerConnection() {
     try {
       this.pc = new RTCPeerConnection(PC_CONFIG);

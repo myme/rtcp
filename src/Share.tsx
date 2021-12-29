@@ -42,6 +42,7 @@ export default function Share(): JSX.Element {
       },
     });
     setSocket(socket);
+    return () => { socket.close(); };
   }, [setSocket]);
 
   return (
