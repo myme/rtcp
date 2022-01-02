@@ -11,7 +11,7 @@ ReactDOM.render(
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Start />} />
-        <Route path="/share" element={<Share />} />
+        <Route path="/:shareId" element={<Share />} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>,

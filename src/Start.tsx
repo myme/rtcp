@@ -1,5 +1,6 @@
 import React, { useCallback } from 'react';
 import { useNavigate } from "react-router-dom";
+import * as uuid from 'uuid';
 
 import logo from '../favicon.svg';
 
@@ -7,7 +8,8 @@ export default function Start() {
   const navigate = useNavigate();
 
   const startShare = useCallback(() => {
-    navigate('/share');
+    const sessionId = uuid.v4();
+    navigate(`/${sessionId}`);
   }, []);
 
   return (
