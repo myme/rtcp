@@ -24,6 +24,10 @@ a {
   text-decoration: none;
 }
 
+button {
+  cursor: pointer;
+}
+
 button, input, select {
   border-color: #e0e0e0;
   border-style: solid;
