@@ -46,6 +46,20 @@ of network address translators (NAT) or firewalls for multimedia applications.
 ** Data channel
 
 *** [[https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API/Simple_RTCDataChannel_sample][A simple RTCDataChannel sample]] :tutorial:
+** Non-browser implementations
+*** [[https://github.com/paullouisageneau/libdatachannel][libdatachannel (C++)]]
+
+#+begin_quote
+C/C++ WebRTC network library featuring Data Channels, Media Transport, and
+WebSockets.
+#+end_quote
+
+*** [[https://www.npmjs.com/package/node-datachannel][node-datachannel]]
+
+#+begin_quote
+NodeJS bindings for libdatachannel library.
+#+end_quote
+
 
 * Tutorials
 
