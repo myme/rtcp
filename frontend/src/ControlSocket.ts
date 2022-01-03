@@ -5,41 +5,58 @@ interface RequestHandler {
   reject(error: string): void;
 }
 
-export default class SignalingSocket {
+export default class ControlSocket {
   private requestId = 0;
   private requestMap = new Map<number, RequestHandler>();
   private socket?: WebSocket;
 
+  public constructor() {
+    console.log('new ControlSocket()');
+  }
+
   private async getSocket(): Promise<WebSocket> {
-    return new Promise((resolve, reject) => {
-      if (this.socket) {
-        switch (this.socket.readyState) {
-          case WebSocket.OPEN:
-            resolve(this.socket);
-          case WebSocket.CONNECTING:
-            break;
-          case WebSocket.CLOSING:
-          case WebSocket.CLOSED:
-          default:
-            reject(new Error('WebSocket closed or closing'));
-        }
-        return;
+    if (this.socket) {
+      switch (this.socket.readyState) {
+        case WebSocket.OPEN:
+          return this.socket;
+        case WebSocket.CONNECTING:
+        case WebSocket.CLOSING:
+        case WebSocket.CLOSED:
+        default:
+          throw new Error('Control socket not open');
       }
+    }
+
+    this.socket = await this.connect();
+    return this.socket;
+  }
+
+  private connect(): Promise<WebSocket> {
+    return new Promise((resolve, reject) => {
+      console.log('ControlSocket::connect()');
 
       const socket = new WebSocket(SIGNALING_SERVER);
-      this.socket = socket;
 
       socket.addEventListener('open', () => {
         resolve(socket);
       });
 
       socket.addEventListener('error', () => {
+        reject();
       });
 
       socket.addEventListener('message', (event) => {
         this.handleMessage(event.data);
       });
     });
+  }
+
+  public close() {
+    if (this.socket) {
+      console.log('ControlSocket::close()');
+      this.socket.close();
+      delete this.socket;
+    }
   }
 
   private handleMessage(data: string) {
@@ -76,7 +93,13 @@ export default class SignalingSocket {
     });
   }
 
-  public async newSession() {
-    return await this.request('newSession');
+  public async newSession(): Promise<string> {
+    const result = await this.request('newSession');
+
+    if (typeof result !== 'string') {
+      throw new Error(`Invalid "newSession" response: ${result}`);
+    }
+
+    return result;
   }
 }

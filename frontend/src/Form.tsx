@@ -1,11 +1,5 @@
 import React, { useCallback, useState } from "react";
-
-type ItemType = 'text' | 'hidden' | 'file';
-
-export interface Item {
-  type: ItemType,
-  value: string,
-}
+import { Item, ItemType } from "./PeerConnection";
 
 interface Props {
   onSubmit(item: Item): void,
