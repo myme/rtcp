@@ -1,16 +1,20 @@
 import React, { useCallback } from 'react';
 import { useNavigate } from "react-router-dom";
-import * as uuid from 'uuid';
 
 import logo from '../favicon.svg';
 
-export default function Start() {
+export interface Props {
+  getSessionId(): Promise<string>;
+}
+
+export default function Start(props: Props) {
+  const { getSessionId } = props;
   const navigate = useNavigate();
 
-  const startShare = useCallback(() => {
-    const sessionId = uuid.v4();
+  const startShare = useCallback(async () => {
+    const sessionId = await getSessionId();
     navigate(`/${sessionId}`);
-  }, []);
+  }, [getSessionId]);
 
   return (
     <>

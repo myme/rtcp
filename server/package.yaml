@@ -1,0 +1,7 @@
+dependencies:
+  - base == 4.*
+  - aeson
+  - websockets
+executables:
+  xchg-server:
+    main: Main.hs

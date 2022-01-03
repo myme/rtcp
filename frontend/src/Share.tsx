@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 
 import logo from '../favicon.svg';
 import Form, { Item } from './Form';
@@ -19,9 +19,9 @@ function Item(props: { item: Item }) {
 }
 
 export default function Share(): JSX.Element {
-  const [socket, setSocket] = useState<Socket>();
-  const [connected, setConnected] = useState(false);
+  const [connectionState, setConnectionState] = useState<string>();
   const [shares, setShares] = useState<Array<Share>>([]);
+  const params = useParams();
 
   const submit = useCallback<(item: Item) => void>((item) => {
     setShares(m => m.concat({ direction: '>', item }));
@@ -33,8 +33,16 @@ export default function Share(): JSX.Element {
 
   useEffect(() => {
     const socket = connectSocket({
+      shareId: params.shareId,
       onConnectionStateChange(state) {
-        setConnected(state === 'connected');
+        switch (state) {
+          case 'connected':
+            setConnectionState('Connected');
+          case 'pending':
+            setConnectionState('Connected');
+          case 'disconnected':
+            setConnectionState('Disconnected');
+        }
       },
       onItem(item) {
         setShares(m => m.concat({ direction: '<', item }));
@@ -42,7 +50,7 @@ export default function Share(): JSX.Element {
     });
     setSocket(socket);
     return () => { socket.close(); };
-  }, [setSocket]);
+  }, [setConnectionState, setSocket]);
 
   return (
     <>
@@ -52,7 +60,7 @@ export default function Share(): JSX.Element {
         </Link>
         xchg
       </h3>
-      Status: <span className="status">{connected ? 'Connected' : 'Disconnected'}</span>
+      Status: <span className="status">{connectionState}</span>
       <Form onSubmit={submit} />
       <pre>
         {shares.map(({ direction, item }, idx) => (
