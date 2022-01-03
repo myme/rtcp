@@ -13,6 +13,7 @@ import qualified Data.Text.IO as T
 import           GHC.Generics
 import           Network.WebSockets (PendingConnection, Connection)
 import qualified Network.WebSockets as WS
+import qualified System.Random as R
 
 stripPrefix :: T.Text -> T.Text -> T.Text
 stripPrefix prefix text = fromMaybe text $ T.stripPrefix prefix text
@@ -52,7 +53,9 @@ instance ToJSON Response where
   toEncoding = JSON.genericToEncoding responseJSONOptions
 
 handleRequest :: Request -> IO String
-handleRequest NewSession = pure "sessionId"
+handleRequest NewSession = do
+  sessionId <- R.randomRIO (100000, 999999)
+  pure $ show (sessionId :: Int)
 handleRequest JoinSession = pure "session joined"
 
 app :: PendingConnection -> IO ()
@@ -60,12 +63,11 @@ app req = do
   conn <- WS.acceptRequest req
   forever $ do
     msg <- JSON.eitherDecode <$> WS.receiveData conn
-    T.putStrLn $ "Got message: " <> T.pack (show (msg :: Either String RequestWithId))
     response <- case msg of
-          Left err -> pure $ Failure Nothing err
-          Right (RequestWithId id request) -> do
-            result <- handleRequest request
-            pure $ Success (Just id) result
+      Left err -> pure $ Failure Nothing err
+      Right (RequestWithId id request) -> do
+        result <- handleRequest request
+        pure $ Success (Just id) result
     WS.sendTextData conn (JSON.encode response)
 
 main :: IO ()
