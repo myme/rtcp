@@ -26,10 +26,6 @@ export default function App() {
     });
   }, [socket, setShares]);
 
-  const getSessionId = useCallback(async () => {
-    return await socket.newSession();
-  }, [socket]);
-
   const onSend = useCallback((item: Item) => {
     peerConnection.sendItem(item);
     addShare({ direction: '>', item });
@@ -37,11 +33,12 @@ export default function App() {
 
   return (
     <Routes>
-      <Route path="/" element={<Start getSessionId={getSessionId} />} />
+      <Route path="/" element={<Start socket={socket} />} />
       <Route path="/:shareId" element={
         <Share
           connectionState={connectionState}
           shares={shares}
+          socket={socket}
           onSend={onSend} />
       } />
     </Routes>

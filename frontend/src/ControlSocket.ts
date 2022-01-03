@@ -8,6 +8,7 @@ interface RequestHandler {
 export default class ControlSocket {
   private requestId = 0;
   private requestMap = new Map<number, RequestHandler>();
+  private sessionId?: string;
   private socket?: WebSocket;
 
   public constructor() {
@@ -60,7 +61,7 @@ export default class ControlSocket {
   }
 
   private handleMessage(data: string) {
-    console.log(`Got message: ${data}`);
+    console.log(`ControlSocket::handleMessage(): Got message: ${data}`);
     const message = JSON.parse(data);
     if (!message.id) {
       throw new Error(`Missing response id`);
@@ -82,11 +83,18 @@ export default class ControlSocket {
     }
   }
 
-  private async request(method: string) {
+  private async request(method: string, params?: object) {
     const socket = await this.getSocket();
     const requestId = ++this.requestId;
 
-    socket.send(JSON.stringify({ id: requestId, method }));
+    const message = { id: requestId, method };
+    if (params) {
+      message.params = params;
+    }
+
+    const messageText = JSON.stringify(message);
+    console.log(`ControlSocket::request(): Sending mesage: ${messageText}`);
+    socket.send(messageText);
 
     return new Promise((resolve, reject) => {
       this.requestMap.set(requestId, { resolve, reject });
@@ -100,6 +108,32 @@ export default class ControlSocket {
       throw new Error(`Invalid "newSession" response: ${result}`);
     }
 
+    this.sessionId = result;
     return result;
+  }
+
+  public async joinSession(sessionId: string) {
+    if (this.sessionId) {
+      console.log(`ControlSocket::joinSession(): Already joined session: ${this.sessionId}`);
+      return;
+    }
+
+    const result = await this.request('joinSession', { sessionId });
+
+    if (result !== 'OK') {
+      throw new Error(`Invalid "joinSession" response: ${result}`);
+    }
+
+    this.sessionId = sessionId;
+  }
+
+  public async leaveSession() {
+    const result = await this.request('leaveSession');
+
+    if (result !== 'OK') {
+      throw new Error(`Invalid "leaveSession" response: ${result}`);
+    }
+
+    delete this.sessionId;
   }
 }

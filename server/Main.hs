@@ -35,6 +35,7 @@ instance FromJSON RequestWithId where
 
 data Request = NewSession
              | JoinSession
+             | LeaveSession
              deriving (Generic, Show)
 
 instance FromJSON Request where
@@ -56,7 +57,8 @@ handleRequest :: Request -> IO String
 handleRequest NewSession = do
   sessionId <- R.randomRIO (100000, 999999)
   pure $ show (sessionId :: Int)
-handleRequest JoinSession = pure "session joined"
+handleRequest JoinSession = pure "OK"
+handleRequest LeaveSession = pure "OK"
 
 app :: PendingConnection -> IO ()
 app req = do

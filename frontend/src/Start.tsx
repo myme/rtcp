@@ -2,19 +2,20 @@ import React, { useCallback } from 'react';
 import { useNavigate } from "react-router-dom";
 
 import logo from '../favicon.svg';
+import ControlSocket from './ControlSocket';
 
 export interface Props {
-  getSessionId(): Promise<string>;
+  socket: ControlSocket,
 }
 
 export default function Start(props: Props) {
-  const { getSessionId } = props;
+  const { socket } = props;
   const navigate = useNavigate();
 
   const startShare = useCallback(async () => {
-    const sessionId = await getSessionId();
+    const sessionId = await socket.newSession();
     navigate(`/${sessionId}`);
-  }, [getSessionId]);
+  }, [socket]);
 
   return (
     <>

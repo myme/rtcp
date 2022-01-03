@@ -1,7 +1,8 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { Link, useParams } from 'react-router-dom';
 
 import logo from '../favicon.svg';
+import ControlSocket from './ControlSocket';
 import Form from './Form';
 import { ConnectionState, Item } from './PeerConnection';
 
@@ -20,13 +21,14 @@ function Item(props: { item: Item }) {
 
 interface Props {
   connectionState: ConnectionState,
+  socket: ControlSocket,
   shares: Share[],
   onSend(item: Item): void,
 }
 
 export default function Share(props: Props): JSX.Element {
-  const { connectionState, shares, onSend } = props;
-  // const params = useParams();
+  const { connectionState, socket, shares, onSend } = props;
+  const { shareId } = useParams();
 
   const connectionText = (function () {
     switch (connectionState) {
@@ -36,6 +38,13 @@ export default function Share(props: Props): JSX.Element {
         return 'Disconnected';
     }
   })();
+
+  useEffect(() => {
+    if (shareId) {
+      socket.joinSession(shareId);
+    }
+    return () => { socket.leaveSession(); };
+  }, [socket]);
 
   return (
     <>
