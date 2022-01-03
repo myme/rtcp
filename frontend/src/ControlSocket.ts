@@ -64,7 +64,13 @@ export default class ControlSocket {
     console.log(`ControlSocket::handleMessage(): Got message: ${data}`);
     const message = JSON.parse(data);
     if (!message.id) {
-      throw new Error(`Missing response id`);
+      switch (message.result) {
+        case 'peerJoined':
+          console.log('ControlSocket::handleMessage(): Peer joined');
+          return;
+        default:
+          throw new Error(`Missing response id: ${data}`);
+      }
     }
 
     const handler = this.requestMap.get(message.id);
@@ -87,11 +93,7 @@ export default class ControlSocket {
     const socket = await this.getSocket();
     const requestId = ++this.requestId;
 
-    const message = { id: requestId, method };
-    if (params) {
-      message.params = params;
-    }
-
+    const message = { id: requestId, method, ...params };
     const messageText = JSON.stringify(message);
     console.log(`ControlSocket::request(): Sending mesage: ${messageText}`);
     socket.send(messageText);
