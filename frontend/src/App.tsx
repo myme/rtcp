@@ -11,7 +11,16 @@ import './style.css';
 export default function App() {
   const [connectionState, setConnectionState] = useState<ConnectionState>('disconnected');
   const [shares, setShares] = useState<Array<IShare>>([]);
-  const socket = useMemo(() => new ControlSocket(), []);
+  const socket = useMemo(() => {
+    return new ControlSocket({
+      onPeerJoined() {
+        peerConnection.sendOffer();
+      },
+      onBroadcast(message) {
+        peerConnection.handleControlMessage(message);
+      },
+    });
+  }, []);
 
   const addShare = useCallback((share: IShare) => {
     setShares(shares => shares.concat(share));
@@ -20,7 +29,13 @@ export default function App() {
   const peerConnection = useMemo(() => {
     return new PeerConnection({
       onConnectionStateChange: setConnectionState,
-      onItem(item: Item) {
+      onIceCandidate(candidate) {
+        socket.broadcast('candidate', { candidate });
+      },
+      onSessionDescription(type, description) {
+        socket.broadcast(type, { description });
+      },
+      onItem(item) {
         addShare({ direction: '<', item });
       },
     });

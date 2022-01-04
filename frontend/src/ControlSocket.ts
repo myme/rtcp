@@ -5,13 +5,18 @@ interface RequestHandler {
   reject(error: string): void;
 }
 
+interface Props {
+  onPeerJoined(): void,
+  onBroadcast(message: any): void,
+}
+
 export default class ControlSocket {
   private requestId = 0;
   private requestMap = new Map<number, RequestHandler>();
   private sessionId?: string;
   private socket?: WebSocket;
 
-  public constructor() {
+  public constructor(readonly props: Props) {
     console.log('new ControlSocket()');
   }
 
@@ -64,9 +69,14 @@ export default class ControlSocket {
     console.log(`ControlSocket::handleMessage(): Got message: ${data}`);
     const message = JSON.parse(data);
     if (!message.id) {
-      switch (message.result) {
+      switch (message.method) {
         case 'peerJoined':
           console.log('ControlSocket::handleMessage(): Peer joined');
+          this.props.onPeerJoined();
+          return;
+        case 'broadcast':
+          console.log('ControlSocket::handleMessage(): Broadcast');
+          this.props.onBroadcast(message.params);
           return;
         default:
           throw new Error(`Missing response id: ${data}`);
@@ -101,6 +111,11 @@ export default class ControlSocket {
     return new Promise((resolve, reject) => {
       this.requestMap.set(requestId, { resolve, reject });
     });
+  }
+
+  public async broadcast(type: string, data: object) {
+    const result = await this.request('broadcast', { params: { type, ...data } });
+    console.log(`ControlSocket::broadcast(): response: ${result}`);
   }
 
   public async newSession(): Promise<string> {
