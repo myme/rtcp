@@ -76,6 +76,12 @@ hasConnection conn = any ((== con_id conn) . con_id . fst)
 hasSession :: SessionId -> State -> Bool
 hasSession sessionId = any ((== Just sessionId) . snd)
 
+sameConnection :: Connection -> (Connection, a) -> Bool
+sameConnection conn = (== con_id conn) . con_id . fst
+
+sameSession :: SessionId -> (a, Maybe SessionId) -> Bool
+sameSession sessionId = (== Just sessionId) . snd
+
 newSession :: Connection -> StateRef -> IO (Either String String)
 newSession conn state = do
   sessionId <- show <$> R.randomRIO (100000, 999999 :: Int)
@@ -106,16 +112,15 @@ joinSession conn sessionId state = do
       pure $ Left err
     Right others -> do
       putStrLn $ "joinSession: sessionId=" <> sessionId <> ", conn=" <> show conn
-      mapM_ notifyJoin others
+      forM_ others $ \other -> do
+        putStrLn $ "joinSession: notifyJoin conn=" <> show conn
+        WS.sendTextData (con_ws other) (JSON.encode $ Notify "peerJoined" Nothing)
       pure $ Right "OK"
   where
     addConnectionToSession state
       | not $ hasSession sessionId state = (state, Left $ "No such session: " <> sessionId)
       | otherwise = ((conn, Just sessionId) : state, Right $ findOthers state)
-    findOthers = map fst . filter ((== Just sessionId) . snd)
-    notifyJoin other = do
-      putStrLn $ "joinSession: notifyJoin conn=" <> show conn
-      WS.sendTextData (con_ws other) (JSON.encode $ Notify "peerJoined" Nothing)
+    findOthers = map fst . filter (sameSession sessionId)
 
 leaveSession :: Connection -> StateRef -> IO (Either String String)
 leaveSession conn state = do
@@ -151,12 +156,11 @@ broadcast payload conn state = do
         WS.sendTextData (con_ws other) (JSON.encode $ Notify "broadcast" (Just payload))
       pure $ Right "OK"
   where
-    findOthers state = case List.find ((== con_id conn) . con_id . fst) state of
+    findOthers state = case List.find (sameConnection conn) state of
       Nothing -> Left $ "No such connection: conn=" <> show conn
       Just (_, Nothing) -> Left $ "Connection is not in a session: conn=" <> show conn
       Just (_, Just sessionId) ->
-        let sameSession = filter ((== Just sessionId) . snd) state
-            others = filter ((/= con_id conn) . con_id . fst) sameSession
+        let others = filter (not . sameConnection conn) $ filter (sameSession sessionId) state
         in Right (sessionId, others)
 
 app :: IO Int -> StateRef -> WS.PendingConnection -> IO ()
