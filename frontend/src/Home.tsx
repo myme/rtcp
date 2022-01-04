@@ -24,14 +24,16 @@ export default function Home() {
     <>
       <img src={logo} height="60px" className="App-logo" alt="logo" />
       <h1>xchg</h1>
-      <p>
-        <input type="text" onChange={onJoinSessionIdChange} />
-      </p>
-      <p>
-        <button onClick={joinShare} disabled={typeof sessionId !== 'number'}>
-          Join share
-        </button>
-      </p>
+      <form>
+        <p>
+          <input type="text" onChange={onJoinSessionIdChange} />
+        </p>
+        <p>
+          <button onClick={joinShare} disabled={typeof sessionId !== 'number'}>
+            Join share
+          </button>
+        </p>
+      </form>
       <p>
         or
       </p>

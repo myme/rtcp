@@ -3,7 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 
 import logo from '../favicon.svg';
 import ControlSocket from './ControlSocket';
-import Form from './Form';
+import ShareForm from './ShareForm';
 import { ConnectionState, Item } from './PeerConnection';
 
 export interface Share {
@@ -60,7 +60,7 @@ export default function Share(props: Props): JSX.Element {
       <span>
         Status: <span className="status">{connectionText}</span>
       </span>
-      <Form onSubmit={onSend} />
+      <ShareForm onSubmit={onSend} />
       <pre>
         {shares.map(({ direction, item }, idx) => (
           <p key={idx}>
