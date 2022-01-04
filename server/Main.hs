@@ -1,4 +1,3 @@
-{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module Main where
@@ -6,56 +5,14 @@ module Main where
 import           Control.Monad (forever, forM_)
 import           Data.Aeson (FromJSON, Options(constructorTagModifier, sumEncoding, allNullaryToStringTag, fieldLabelModifier), (.:), ToJSON)
 import qualified Data.Aeson as JSON
-import           Data.Char (toLower)
 import qualified Data.IORef as Ref
 import qualified Data.List as List
-import           Data.Maybe (fromMaybe)
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
-import           GHC.Generics
+import           GHC.Generics ()
+import qualified Messages as Msg
 import qualified Network.WebSockets as WS
 import qualified System.Random as R
-
-stripPrefix :: T.Text -> T.Text -> T.Text
-stripPrefix prefix text = fromMaybe text $ T.stripPrefix prefix text
-
-requestJSONOptions = JSON.defaultOptions
-  { allNullaryToStringTag = False
-  , constructorTagModifier = \(c:cs) -> toLower c : cs
-  , fieldLabelModifier = T.unpack . stripPrefix "request_" . T.pack
-  , sumEncoding = JSON.TaggedObject "method" "method"
-  }
-
-data RequestWithId = RequestWithId
-  { request_id :: Int
-  , request :: Request
-  } deriving Show
-
-instance FromJSON RequestWithId where
-  parseJSON = JSON.withObject "RequestWithId" $ \obj ->
-    RequestWithId <$> (obj .: "id") <*> JSON.parseJSON (JSON.toJSON obj)
-
-data Request = NewSession
-             | JoinSession { request_sessionId :: String }
-             | LeaveSession
-             | Broadcast { request_params :: JSON.Value }
-             deriving (Generic, Show)
-
-instance FromJSON Request where
-  parseJSON = JSON.genericParseJSON requestJSONOptions
-
-data Response = Success { response_id :: Maybe Int, response_result :: JSON.Value }
-              | Notify { response_method :: String, response_params :: Maybe JSON.Value }
-              | Failure { response_id :: Maybe Int, response_error :: String }
-  deriving (Generic, Show)
-
-responseJSONOptions = JSON.defaultOptions
-  { fieldLabelModifier = T.unpack . stripPrefix "response_" . T.pack
-  , sumEncoding = JSON.UntaggedValue
-  }
-
-instance ToJSON Response where
-  toEncoding = JSON.genericToEncoding responseJSONOptions
 
 type ConnectionId = Int
 data Connection = Connection
@@ -114,7 +71,7 @@ joinSession conn sessionId state = do
       putStrLn $ "joinSession: sessionId=" <> sessionId <> ", conn=" <> show conn
       forM_ others $ \other -> do
         putStrLn $ "joinSession: notifyJoin conn=" <> show conn
-        WS.sendTextData (con_ws other) (JSON.encode $ Notify "peerJoined" Nothing)
+        WS.sendTextData (con_ws other) (JSON.encode $ Msg.Notify "peerJoined" Nothing)
       pure $ Right "OK"
   where
     addConnectionToSession state
@@ -153,7 +110,7 @@ broadcast payload conn state = do
           $  "broadcast: sessionId=" <> sessionId
           <> ", from=" <> show conn
           <> ", to=" <> show other
-        WS.sendTextData (con_ws other) (JSON.encode $ Notify "broadcast" (Just payload))
+        WS.sendTextData (con_ws other) (JSON.encode $ Msg.Notify "broadcast" (Just payload))
       pure $ Right "OK"
   where
     findOthers state = case List.find (sameConnection conn) state of
@@ -172,16 +129,16 @@ app getConnId state req = do
     response <- case msg of
       Left err -> do
         putStrLn $ "FAILURE: app: " <> err
-        pure $ Failure Nothing err
-      Right (RequestWithId id request) -> do
+        pure $ Msg.Failure Nothing err
+      Right (Msg.RequestWithId id request) -> do
         result <- case request of
-          NewSession -> newSession conn state
-          JoinSession sessionId -> joinSession conn sessionId state
-          LeaveSession -> leaveSession conn state
-          Broadcast payload -> broadcast payload conn state
+          Msg.NewSession -> newSession conn state
+          Msg.JoinSession sessionId -> joinSession conn sessionId state
+          Msg.LeaveSession -> leaveSession conn state
+          Msg.Broadcast payload -> broadcast payload conn state
         pure $ case result of
-          Left err -> Failure (Just id) err
-          Right res -> Success (Just id) (JSON.String $ T.pack res)
+          Left err -> Msg.Failure (Just id) err
+          Right res -> Msg.Success (Just id) (JSON.String $ T.pack res)
     WS.sendTextData (con_ws conn) (JSON.encode response)
 
 main :: IO ()
