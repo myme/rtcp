@@ -9,7 +9,7 @@ import qualified Data.IORef as Ref
 import qualified Data.List as List
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
-import           GHC.Generics ()
+import qualified Log
 import qualified Messages as Msg
 import qualified Network.WebSockets as WS
 import qualified System.Random as R
@@ -45,10 +45,10 @@ newSession conn state = do
   result <- Ref.atomicModifyIORef' state (setConnectionSessionId conn sessionId)
   case result of
     Left err -> do
-      putStrLn $ "FAILURE: newSession: sessionId=" <> sessionId <> ", conn=" <> show conn <> ": " <> err
+      Log.err $ "FAILURE: newSession: sessionId=" <> sessionId <> ", conn=" <> show conn <> ": " <> err
       pure $ Left err
     result -> do
-      putStrLn $ "newSession: sessionId=" <> sessionId <> ", conn=" <> show conn
+      Log.info $ "newSession: sessionId=" <> sessionId <> ", conn=" <> show conn
       pure $ Right sessionId
 
 setConnectionSessionId :: Connection -> SessionId -> State -> (State, Either String String)
@@ -65,12 +65,12 @@ joinSession conn sessionId state = do
   result <- Ref.atomicModifyIORef' state addConnectionToSession
   case result of
     Left err -> do
-      putStrLn $ "FAILURE: joinSession: sessionId=" <> sessionId <> ", conn=" <> show conn <> ": " <> err
+      Log.err $ "FAILURE: joinSession: sessionId=" <> sessionId <> ", conn=" <> show conn <> ": " <> err
       pure $ Left err
     Right others -> do
-      putStrLn $ "joinSession: sessionId=" <> sessionId <> ", conn=" <> show conn
+      Log.info $ "joinSession: sessionId=" <> sessionId <> ", conn=" <> show conn
       forM_ others $ \other -> do
-        putStrLn $ "joinSession: notifyJoin conn=" <> show conn
+        Log.info $ "joinSession: notifyJoin conn=" <> show conn
         WS.sendTextData (con_ws other) (JSON.encode $ Msg.Notify "peerJoined" Nothing)
       pure $ Right "OK"
   where
@@ -84,10 +84,10 @@ leaveSession conn state = do
   result <- Ref.atomicModifyIORef' state removeConnectionFromSession
   case result of
     Left err -> do
-      putStrLn $ "FAILURE: leaveSession: conn=" <> show conn <> ": " <> err
+      Log.err $ "FAILURE: leaveSession: conn=" <> show conn <> ": " <> err
       pure $ Left err
     result -> do
-      putStrLn $ "leaveSession: conn=" <> show conn
+      Log.info $ "leaveSession: conn=" <> show conn
       pure result
   where
     removeConnectionFromSession state
@@ -102,11 +102,11 @@ broadcast payload conn state = do
   result <- findOthers <$> Ref.readIORef state
   case result of
     Left err -> do
-      putStrLn $ "FAILURE: broadcst: " <> err
+      Log.err $ "FAILURE: broadcast: " <> err
       pure $ Left err
     Right (sessionId, others) -> do
       forM_ others $ \(other, _) -> do
-        putStrLn
+        Log.info
           $  "broadcast: sessionId=" <> sessionId
           <> ", from=" <> show conn
           <> ", to=" <> show other
@@ -128,7 +128,7 @@ app getConnId state req = do
     msg <- JSON.eitherDecode <$> WS.receiveData (con_ws conn)
     response <- case msg of
       Left err -> do
-        putStrLn $ "FAILURE: app: " <> err
+        Log.err $ "FAILURE: app: " <> err
         pure $ Msg.Failure Nothing err
       Right (Msg.RequestWithId id request) -> do
         result <- case request of
@@ -145,7 +145,7 @@ main :: IO ()
 main = do
   let host = "localhost"
       port = 3001
-  putStrLn $ "Starting server on " <> host <> ":" <> show port
+  Log.info $ "Starting server on " <> host <> ":" <> show port
   nextId <- Ref.newIORef 1
   let getNextId = Ref.atomicModifyIORef' nextId $ \id -> (id + 1, id)
   state <- Ref.newIORef []
