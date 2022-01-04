@@ -39,9 +39,12 @@ sameConnection conn = (== con_id conn) . con_id . fst
 sameSession :: SessionId -> (a, Maybe SessionId) -> Bool
 sameSession sessionId = (== Just sessionId) . snd
 
+leftPad :: Int -> Char -> String -> String
+leftPad n c s = replicate (n - length s) c <> s
+
 newSession :: Connection -> StateRef -> IO (Either String String)
 newSession conn state = do
-  sessionId <- show <$> R.randomRIO (100000, 999999 :: Int)
+  sessionId <- leftPad 6 '0' . show <$> R.randomRIO (0, 999999 :: Int)
   result <- Ref.atomicModifyIORef' state (setConnectionSessionId conn sessionId)
   case result of
     Left err -> do
