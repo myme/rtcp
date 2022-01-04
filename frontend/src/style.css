@@ -21,7 +21,12 @@ h1 {
 }
 
 a {
+  color: #005899;
   text-decoration: none;
+}
+
+a:hover {
+  text-decoration-line: underline;
 }
 
 button {
@@ -48,6 +53,7 @@ a.button, button, input, select {
 
 a.button:hover, button:hover {
   background-color: #d0d0d7;
+  text-decoration: none;
 }
 
 form .group > * {

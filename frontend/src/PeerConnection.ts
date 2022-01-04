@@ -1,6 +1,6 @@
 const PC_CONFIG = {};
 
-export type ConnectionState = 'connected' | 'disconnected';
+export type ConnectionState = 'pending' | 'connected' | 'disconnected';
 
 export type ItemType = 'text' | 'hidden' | 'file';
 
@@ -121,6 +121,7 @@ export default class PeerConnection {
     const sessionDescription = await pc.createOffer();
     pc.setLocalDescription(sessionDescription);
     this.props.onSessionDescription('offer', sessionDescription);
+    this.props.onConnectionStateChange('pending');
   }
 
   private async sendAnswer() {

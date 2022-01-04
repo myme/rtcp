@@ -10,7 +10,7 @@ import PeerConnection, { ConnectionState, Item } from './PeerConnection';
 import './style.css';
 
 export default function App() {
-  const [connectionState, setConnectionState] = useState<ConnectionState>('disconnected');
+  const [connectionState, setConnectionState] = useState<ConnectionState>('pending');
   const [shares, setShares] = useState<Array<IShare>>([]);
   const socket = useMemo(() => {
     return new ControlSocket({
@@ -56,7 +56,8 @@ export default function App() {
           connectionState={connectionState}
           shares={shares}
           socket={socket}
-          onSend={onSend} />
+          onSend={onSend}
+        />
       } />
     </Routes>
   );

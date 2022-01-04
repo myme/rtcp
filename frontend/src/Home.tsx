@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 import { Link, useNavigate } from "react-router-dom";
 
-import logo from '../favicon.svg';
+import Header from './Header';
 import JoinForm from './JoinForm';
 
 export default function Home() {
@@ -13,8 +13,7 @@ export default function Home() {
 
   return (
     <>
-      <img src={logo} height="60px" className="App-logo" alt="logo" />
-      <h1>xchg</h1>
+      <Header />
       <JoinForm joinShare={joinShare} />
       <p>
         or

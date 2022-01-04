@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 
-import logo from '../favicon.svg';
+import Header from './Header';
 import ControlSocket from './ControlSocket';
 import ShareForm from './ShareForm';
 import { ConnectionState, Item } from './PeerConnection';
@@ -36,6 +36,8 @@ export default function Share(props: Props): JSX.Element {
         return 'Connected';
       case 'disconnected':
         return 'Disconnected';
+      case 'pending':
+        return 'Pending'
     }
   })();
 
@@ -48,28 +50,45 @@ export default function Share(props: Props): JSX.Element {
 
   return (
     <>
-      <h3>
-        <Link to="/">
-          <img src={logo} height="30px" className="App-logo" alt="logo" />
-        </Link>
-        xchg
-      </h3>
-      <span>
-        Share ID: {shareId}
-      </span>
-      <span>
-        Status: <span className="status">{connectionText}</span>
-      </span>
-      <ShareForm onSubmit={onSend} />
-      <pre>
-        {shares.map(({ direction, item }, idx) => (
-          <p key={idx}>
-            {direction}
-            {' '}
-            <Item key={idx} item={item} />
-          </p>
-        ))}
-      </pre>
+      <Header />
+      {(function () {
+        switch (connectionState) {
+          case 'pending':
+            return (
+              <Link to={`/${shareId}`}>
+                <h1>{shareId}</h1>
+              </Link>
+            );
+          case 'disconnected':
+            return (
+              <>
+                <h2>Peer disconnected</h2>
+                <Link className="button" to="/">Home</Link>
+              </>
+            );
+          case 'connected':
+            return (
+              <>
+                <span>
+                  Share ID: {shareId}
+                </span>
+                <span>
+                  Status: <span className="status">{connectionText}</span>
+                </span>
+                <ShareForm onSubmit={onSend} />
+                <pre>
+                  {shares.map(({ direction, item }, idx) => (
+                    <p key={idx}>
+                      {direction}
+                      {' '}
+                      <Item key={idx} item={item} />
+                    </p>
+                  ))}
+                </pre>
+              </>
+            );
+        }
+      })()}
     </>
   );
 }

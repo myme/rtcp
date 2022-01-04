@@ -1,8 +1,8 @@
 import React, { useEffect }  from 'react';
 import { useNavigate } from "react-router-dom";
 
-import logo from '../favicon.svg';
 import ControlSocket from './ControlSocket';
+import Header from './Header';
 
 export interface Props {
   socket: ControlSocket,
@@ -21,8 +21,7 @@ export default function New(props: Props) {
 
   return (
     <>
-      <img src={logo} height="60px" className="App-logo" alt="logo" />
-      <h1>xchg</h1>
+      <Header />
       <p>
         {'Loading...'}
       </p>
