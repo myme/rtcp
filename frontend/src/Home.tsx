@@ -2,32 +2,23 @@ import React, { ChangeEvent, useCallback, useState } from 'react';
 import { useNavigate } from "react-router-dom";
 
 import logo from '../favicon.svg';
-import ControlSocket from './ControlSocket';
 
-export interface Props {
-  socket: ControlSocket,
-}
-
-export default function Start(props: Props) {
+export default function Home() {
   const [sessionId, setSessionId] = useState<number>();
-  const { socket } = props;
   const navigate = useNavigate();
 
-  const startShare = useCallback(async () => {
-    const sessionId = await socket.newSession();
-    navigate(`/${sessionId}`);
-  }, [socket]);
+  const newShare = useCallback(() => {
+    navigate(`/new`);
+  }, [navigate]);
 
   const joinShare = useCallback(() => {
     navigate(`/${sessionId}`);
-  }, [sessionId]);
+  }, [navigate, sessionId]);
 
   const onJoinSessionIdChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
     const num = Number(event.target.value);
     setSessionId(!event.target.value || isNaN(num) ? undefined : num);
   }, [setSessionId]);
-
-  console.log('sessionId', sessionId);
 
   return (
     <>
@@ -45,7 +36,7 @@ export default function Start(props: Props) {
         or
       </p>
       <p>
-        <button onClick={startShare}>Start a new share</button>
+        <a href="/new" className="button" onClick={newShare}>Start a new share</a>
       </p>
     </>
   );

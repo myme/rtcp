@@ -2,7 +2,7 @@
   margin: 0.2em;
 }
 
-#app {
+body {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -32,11 +32,22 @@ button[disabled] {
   cursor: grabbing;
 }
 
-button, input, select {
+a.button, button, input, select {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  display: inline-block;
+  font-size: 14px;
+  color: #161616;
+  background-color: #e9e9ed;
   border-color: #e0e0e0;
   border-style: solid;
   border-radius: 0.5em;
+  border-width: 0.2em;
+  box-sizing: border-box;
   padding: 10px;
+}
+
+a.button:hover, button:hover {
+  background-color: #d0d0d7;
 }
 
 pre {

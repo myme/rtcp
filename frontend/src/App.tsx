@@ -1,10 +1,11 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { Route, Routes } from 'react-router-dom';
 
+import Home from './Home';
 import Share, { Share as IShare } from './Share';
+import New from './New';
 import ControlSocket from './ControlSocket';
 import PeerConnection, { ConnectionState, Item } from './PeerConnection';
-import Start from './Start';
 
 import './style.css';
 
@@ -48,7 +49,8 @@ export default function App() {
 
   return (
     <Routes>
-      <Route path="/" element={<Start socket={socket} />} />
+      <Route path="/" element={<Home />} />
+      <Route path="/new" element={<New socket={socket} />} />
       <Route path="/:shareId" element={
         <Share
           connectionState={connectionState}
