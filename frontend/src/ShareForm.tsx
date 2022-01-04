@@ -33,12 +33,14 @@ export default function Form(props: Props): JSX.Element {
 
   return (
     <form id="client" onSubmit={submit}>
-      <select value={type} onChange={typeChange}>
-        <option value="text">Text</option>
-        <option value="hidden">Hidden</option>
-        <option value="file">File</option>
-      </select>
-      <input type={type === 'hidden' ? 'password' : type} value={input} onChange={inputChange} />
+      <span className="group">
+        <select value={type} onChange={typeChange}>
+          <option value="text">Text</option>
+          <option value="hidden">Hidden</option>
+          <option value="file">File</option>
+        </select>
+        <input type={type === 'hidden' ? 'password' : type} value={input} onChange={inputChange} />
+      </span>
       <button type="submit">Share</button>
     </form>
   );

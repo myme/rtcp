@@ -58,7 +58,7 @@ a.button:hover, button:hover {
 
 form .group > * {
   margin-right: 0;
-  margin-left: -0.1em;
+  margin-left: -0.2em;
 }
 
 form .group :first-child {

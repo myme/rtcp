@@ -30,17 +30,6 @@ export default function Share(props: Props): JSX.Element {
   const { connectionState, socket, shares, onSend } = props;
   const { shareId } = useParams();
 
-  const connectionText = (function () {
-    switch (connectionState) {
-      case 'connected':
-        return 'Connected';
-      case 'disconnected':
-        return 'Disconnected';
-      case 'pending':
-        return 'Pending'
-    }
-  })();
-
   useEffect(() => {
     if (shareId) {
       socket.joinSession(shareId);
@@ -50,14 +39,16 @@ export default function Share(props: Props): JSX.Element {
 
   return (
     <>
-      <Header />
-      {(function () {
+      <Header small={connectionState === 'connected'} />
+      {(function (): JSX.Element {
         switch (connectionState) {
           case 'pending':
             return (
-              <Link to={`/${shareId}`}>
-                <h1>{shareId}</h1>
-              </Link>
+              <h1>
+                <Link to={`/${shareId}`}>
+                  {shareId}
+                </Link>
+              </h1>
             );
           case 'disconnected':
             return (
@@ -70,10 +61,9 @@ export default function Share(props: Props): JSX.Element {
             return (
               <>
                 <span>
-                  Share ID: {shareId}
-                </span>
-                <span>
-                  Status: <span className="status">{connectionText}</span>
+                  <Link to={`/${shareId}`}>
+                    {shareId}
+                  </Link>
                 </span>
                 <ShareForm onSubmit={onSend} />
                 <pre>
