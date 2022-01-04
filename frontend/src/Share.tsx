@@ -54,7 +54,12 @@ export default function Share(props: Props): JSX.Element {
         </Link>
         xchg
       </h3>
-      Status: <span className="status">{connectionText}</span>
+      <span>
+        Share ID: {shareId}
+      </span>
+      <span>
+        Status: <span className="status">{connectionText}</span>
+      </span>
       <Form onSubmit={onSend} />
       <pre>
         {shares.map(({ direction, item }, idx) => (
