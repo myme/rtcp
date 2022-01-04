@@ -1,44 +1,26 @@
-import React, { ChangeEvent, useCallback, useState } from 'react';
-import { useNavigate } from "react-router-dom";
+import React, { useCallback } from 'react';
+import { Link, useNavigate } from "react-router-dom";
 
 import logo from '../favicon.svg';
+import JoinForm from './JoinForm';
 
 export default function Home() {
-  const [sessionId, setSessionId] = useState<number>();
   const navigate = useNavigate();
 
-  const newShare = useCallback(() => {
-    navigate(`/new`);
-  }, [navigate]);
-
-  const joinShare = useCallback(() => {
+  const joinShare = useCallback((sessionId: string) => {
     navigate(`/${sessionId}`);
-  }, [navigate, sessionId]);
-
-  const onJoinSessionIdChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
-    const num = Number(event.target.value);
-    setSessionId(!event.target.value || isNaN(num) ? undefined : num);
-  }, [setSessionId]);
+  }, [navigate]);
 
   return (
     <>
       <img src={logo} height="60px" className="App-logo" alt="logo" />
       <h1>xchg</h1>
-      <form>
-        <p>
-          <input type="text" onChange={onJoinSessionIdChange} />
-        </p>
-        <p>
-          <button onClick={joinShare} disabled={typeof sessionId !== 'number'}>
-            Join share
-          </button>
-        </p>
-      </form>
+      <JoinForm joinShare={joinShare} />
       <p>
         or
       </p>
       <p>
-        <a href="/new" className="button" onClick={newShare}>Start a new share</a>
+        <Link to="/new" className="button">Start a new share</Link>
       </p>
     </>
   );

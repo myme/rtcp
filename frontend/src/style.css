@@ -50,6 +50,19 @@ a.button:hover, button:hover {
   background-color: #d0d0d7;
 }
 
+form .group > * {
+  margin-right: 0;
+  margin-left: -0.1em;
+}
+
+form .group :first-child {
+  border-radius: 0.5em 0 0 0.5em;
+}
+
+form .group :last-child {
+  border-radius: 0 0.5em 0.5em 0;
+}
+
 pre {
   text-align: left;
   border-width: 0.1em;
