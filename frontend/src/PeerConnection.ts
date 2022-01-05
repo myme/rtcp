@@ -1,6 +1,6 @@
 import { Share } from "./Share";
 
-const PC_CONFIG = {};
+const PC_CONFIG: RTCConfiguration = {};
 
 export type ConnectionState = 'pending' | 'connected' | 'disconnected';
 

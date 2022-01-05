@@ -2,6 +2,7 @@ dependencies:
   - base == 4.*
   - aeson
   - random
+  - text
   - websockets
 executables:
   xchg-server:
