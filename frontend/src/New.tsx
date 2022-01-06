@@ -5,7 +5,7 @@ import ControlSocket from './ControlSocket';
 import Header from './Header';
 
 export interface Props {
-  socket: ControlSocket,
+  socket?: ControlSocket,
 }
 
 export default function New(props: Props) {
@@ -14,10 +14,13 @@ export default function New(props: Props) {
 
   useEffect(() => {
     (async function() {
+      if (!socket) {
+        return;
+      }
       const sessionId = await socket.newSession();
       navigate(`/${sessionId}`);
     })();
-  }, []);
+  }, [socket]);
 
   return (
     <>

@@ -1,6 +1,7 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Route, Routes } from 'react-router-dom';
 
+import ConnectionManager from './ConnectionManager';
 import Home from './Home';
 import Share, { Share as IShare } from './Share';
 import New from './New';
@@ -10,55 +11,43 @@ import PeerConnection, { ConnectionState, Item } from './PeerConnection';
 import './style.css';
 
 export default function App() {
+  const [controlSocket, setControlSocket] = useState<ControlSocket>();
+  const [peerConnection, setPeerConnection] = useState<PeerConnection>();
   const [connectionState, setConnectionState] = useState<ConnectionState>('pending');
   const [shares, setShares] = useState<Array<IShare>>([]);
-  const socket = useMemo(() => {
-    return new ControlSocket({
-      onPeerJoined() {
-        peerConnection.sendOffer();
-      },
-      onBroadcast(message) {
-        peerConnection.handleControlMessage(message);
-      },
-    });
-  }, []);
 
   const addShare = useCallback((share: IShare) => {
     setShares(shares => shares.concat(share));
   }, [setShares]);
 
-  const peerConnection = useMemo(() => {
-    return new PeerConnection({
-      onConnectionStateChange: setConnectionState,
-      onIceCandidate(candidate) {
-        socket.broadcast('candidate', { candidate });
-      },
-      onSessionDescription(type, description) {
-        socket.broadcast(type, { description });
-      },
-      onItem(item) {
-        addShare({ direction: '<', item });
-      },
-    });
-  }, [socket, setShares]);
-
   const onSend = useCallback((item: Item) => {
-    peerConnection.sendItem(item);
-    addShare({ direction: '>', item });
+    if (peerConnection) {
+      peerConnection.sendItem(item);
+      addShare({ direction: '>', item });
+    }
   }, [addShare, peerConnection]);
 
   return (
     <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/new" element={<New socket={socket} />} />
-      <Route path="/:shareId" element={
-        <Share
-          connectionState={connectionState}
-          shares={shares}
-          socket={socket}
-          onSend={onSend}
+      <Route index element={<Home />} />
+      <Route element={
+        <ConnectionManager
+          addShare={addShare}
+          setConnectionState={setConnectionState}
+          setControlSocket={setControlSocket}
+          setPeerConnection={setPeerConnection}
         />
-      } />
+      }>
+        <Route path="/new" element={<New socket={controlSocket} />} />
+        <Route path="/:shareId" element={
+          <Share
+            connectionState={connectionState}
+            shares={shares}
+            socket={controlSocket}
+            onSend={onSend}
+          />
+        } />
+      </Route>
     </Routes>
   );
 }

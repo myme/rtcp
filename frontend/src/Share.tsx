@@ -21,7 +21,7 @@ function Item(props: { item: Item }) {
 
 interface Props {
   connectionState: ConnectionState,
-  socket: ControlSocket,
+  socket?: ControlSocket,
   shares: Share[],
   onSend(item: Item): void,
 }
@@ -31,6 +31,9 @@ export default function Share(props: Props): JSX.Element {
   const { shareId } = useParams();
 
   useEffect(() => {
+    if (!socket) {
+      return;
+    }
     if (shareId) {
       socket.joinSession(shareId);
     }
