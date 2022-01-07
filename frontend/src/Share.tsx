@@ -1,29 +1,23 @@
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 
 import Header from './Header';
 import ControlSocket from './ControlSocket';
 import ShareForm from './ShareForm';
-import { ConnectionState, Item } from './PeerConnection';
+import { ConnectionState, Item as IItem } from './PeerConnection';
+import Item from './Item';
 
 export interface Share {
   direction: '>' | '<',
-  item: Item,
-}
-
-function Item(props: { item: Item }) {
-  const { item: { type, value } } = props;
-  const output = type === 'hidden' ? value.replace(/./g, '*') : value;
-  return (
-    <span>{output}</span>
-  );
+  item: IItem,
 }
 
 interface Props {
   connectionState: ConnectionState,
   socket?: ControlSocket,
   shares: Share[],
-  onSend(item: Item): void,
+  onRemoveItem(index: number): void,
+  onSend(item: IItem): void,
 }
 
 export default function Share(props: Props): JSX.Element {
@@ -40,10 +34,19 @@ export default function Share(props: Props): JSX.Element {
     return () => { socket.leaveSession(); };
   }, [socket]);
 
+  const onCopyItem = useCallback((index: number) => async () => {
+    const value = shares[index];
+    await navigator.clipboard.writeText(value.item.value);
+  }, [shares]);
+
+  const onRemoveItem = useCallback((index: number) => () => {
+    return props.onRemoveItem(index);
+  }, []);
+
   return (
     <>
       <Header small={connectionState === 'connected'} />
-      {(function (): JSX.Element {
+      {(function(): JSX.Element {
         switch (connectionState) {
           case 'pending':
             return (
@@ -68,15 +71,19 @@ export default function Share(props: Props): JSX.Element {
                 </Link>
                 {' '}
                 <ShareForm onSubmit={onSend} />
-                <pre>
-                  {shares.map(({ direction, item }, idx) => (
-                    <p key={idx}>
-                      {direction}
-                      {' '}
-                      <Item key={idx} item={item} />
-                    </p>
-                  ))}
-                </pre>
+                {!!shares.length && (
+                  <ul className="unstyled">
+                    {shares.map(({ item }, idx) => (
+                      <li key={idx}>
+                        <Item
+                          item={item}
+                          onCopyItem={onCopyItem(idx)}
+                          onRemoveItem={onRemoveItem(idx)}
+                        />
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </>
             );
         }

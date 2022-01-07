@@ -41,7 +41,7 @@ export default function Form(props: Props): JSX.Element {
         </select>
         <input type={type === 'hidden' ? 'password' : type} value={input} onChange={inputChange} />
       </span>
-      <button type="submit">Share</button>
+      <button type="submit" disabled={!input.trim().length}>Share</button>
     </form>
   );
 }

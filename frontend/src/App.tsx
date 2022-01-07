@@ -14,10 +14,14 @@ export default function App() {
   const [controlSocket, setControlSocket] = useState<ControlSocket>();
   const [peerConnection, setPeerConnection] = useState<PeerConnection>();
   const [connectionState, setConnectionState] = useState<ConnectionState>('pending');
-  const [shares, setShares] = useState<Array<IShare>>([]);
+  const [shares, setShares] = useState<IShare[]>([]);
 
   const addShare = useCallback((share: IShare) => {
     setShares(shares => shares.concat(share));
+  }, [setShares]);
+
+  const onRemoveItem = useCallback((index: number) => {
+    setShares(shares => shares.filter((_, i) => i !== index));
   }, [setShares]);
 
   const onSend = useCallback((item: Item) => {
@@ -44,6 +48,7 @@ export default function App() {
             connectionState={connectionState}
             shares={shares}
             socket={controlSocket}
+            onRemoveItem={onRemoveItem}
             onSend={onSend}
           />
         } />
