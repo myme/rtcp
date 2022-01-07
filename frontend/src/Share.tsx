@@ -19,7 +19,7 @@ interface Props {
   socket?: ControlSocket,
   shares: Share[],
   onCopyItem(id: string): void,
-  onRemoveItem(id: string): void,
+  onRemoveShare(id: string): void,
   onSend(item: IItem): void,
 }
 
@@ -41,9 +41,9 @@ export default function Share(props: Props): JSX.Element {
     return props.onCopyItem(id);
   }, [shares]);
 
-  const onRemoveItem = useCallback((id: string) => () => {
-    return props.onRemoveItem(id);
-  }, []);
+  const onRemoveShare = useCallback((id: string) => () => {
+    return props.onRemoveShare(id);
+  }, [props.onRemoveShare]);
 
   return (
     <>
@@ -80,7 +80,7 @@ export default function Share(props: Props): JSX.Element {
                         <Item
                           item={item}
                           onCopyItem={onCopyItem(id)}
-                          onRemoveItem={onRemoveItem(id)}
+                          onRemoveItem={onRemoveShare(id)}
                         />
                       </li>
                     ))}

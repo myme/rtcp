@@ -21,11 +21,12 @@ export default function App() {
     const id = uuid.v4();
     const share = { id, direction, item };
     setShares(shares => shares.concat(share));
+    return share;
   }, [setShares]);
 
-  const addIncomingShare = useCallback((item: Item) => {
-    addShare('inbound', item);
-  }, [addShare]);
+  const addIncomingShare = useCallback((share: IShare) => {
+    setShares(shares => shares.concat(share));
+  }, [setShares]);
 
   const onCopyItem = useCallback((id: string) => {
     const share = shares.find(share => share.id === id);
@@ -35,15 +36,26 @@ export default function App() {
     navigator.clipboard.writeText(share.item.value);
   }, [shares]);
 
-  const onRemoveItem = useCallback((id: string) => {
+  const onRemoveLocalShare = useCallback((id: string) => {
+    setShares(shares => shares.filter(share => share.id !== id));
+    if (!peerConnection) {
+      console.error('App::onLocalRemoveShare(): No peer connection');
+      return;
+    }
+    peerConnection.removeShare(id);
+  }, [peerConnection, setShares]);
+
+  const onRemoteShareRemoved = useCallback((id: string) => {
     setShares(shares => shares.filter(share => share.id !== id));
   }, [setShares]);
 
   const onSend = useCallback((item: Item) => {
-    if (peerConnection) {
-      peerConnection.sendItem(item);
-      addShare('outbound', item);
+    const share = addShare('outbound', item);
+    if (!peerConnection) {
+      console.error('App::onSend(): No peer connection');
+      return;
     }
+    peerConnection.sendShare(share);
   }, [addShare, peerConnection]);
 
   return (
@@ -51,7 +63,8 @@ export default function App() {
       <Route index element={<Home />} />
       <Route element={
         <ConnectionManager
-          addShare={addIncomingShare}
+          onAddShare={addIncomingShare}
+          onShareRemoved={onRemoteShareRemoved}
           setConnectionState={setConnectionState}
           setControlSocket={setControlSocket}
           setPeerConnection={setPeerConnection}
@@ -64,7 +77,7 @@ export default function App() {
             shares={shares}
             socket={controlSocket}
             onCopyItem={onCopyItem}
-            onRemoveItem={onRemoveItem}
+            onRemoveShare={onRemoveLocalShare}
             onSend={onSend}
           />
         } />

@@ -1,3 +1,5 @@
+import { Share } from "./Share";
+
 const PC_CONFIG = {};
 
 export type ConnectionState = 'pending' | 'connected' | 'disconnected';
@@ -9,13 +11,15 @@ export interface Item {
   value: string,
 }
 
+type MessageType = 'share' | 'removeShare';
 type SessionType = 'offer' | 'answer';
 
 export interface Props {
   onConnectionStateChange: (state: ConnectionState) => void,
   onIceCandidate(candidate: RTCIceCandidate): void,
   onSessionDescription(type: SessionType, description: RTCSessionDescriptionInit): void,
-  onItem: (item: Item) => void,
+  onShare(share: Share): void,
+  onRemoveShare(id: string): void,
 }
 
 export default class PeerConnection {
@@ -91,11 +95,47 @@ export default class PeerConnection {
     }
   }
 
+  private handleDataChannelMessage(message: string) {
+    try {
+      console.log(`PeerConnection::handleDataChannelMessage(): ${message}`);
+      const data = JSON.parse(message);
+
+      if (!data || typeof data.type !== 'string') {
+        throw new Error(`Invalid message: ${message}`);
+      }
+
+      const { type, ...payload } = data;
+
+      switch (type as MessageType) {
+        case 'share':
+          if (typeof payload.share !== 'object') {
+            throw new Error(`Invalid share object: ${payload.share}`);
+          }
+          this.props.onShare({ ...payload.share, 'direction': 'inbound' });
+          break;
+        case 'removeShare':
+          if (typeof payload.id !== 'string') {
+            throw new Error(`Invalid id: ${payload.id}`);
+          }
+          this.props.onRemoveShare(payload.id);
+          break;
+        default:
+          throw new Error(`Invalid type: ${type}: ${message}`);
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        console.error(`PeerConnection::handleDataChannelMessage(): ${error.message}`);
+      } else {
+        console.error(`PeerConnection::handleDataChannelMessage(): Invalid message: ${message}`);
+      }
+    }
+  }
+
   private setDataChannel(channel: RTCDataChannel) {
     console.log('PeerConnection::setDataChannel()');
     this.channel = channel;
     this.channel.onmessage = (event) => {
-      this.props.onItem(JSON.parse(event.data));
+      this.handleDataChannelMessage(event.data);
     };
     this.channel.onopen = () => {
       this.props.onConnectionStateChange('connected');
@@ -132,11 +172,21 @@ export default class PeerConnection {
     this.props.onSessionDescription('answer', sessionDescription);
   }
 
-  public sendItem(item: Item) {
-    if (this.channel) {
-      const message = JSON.stringify(item);
-      console.log(`PeerConnection::sendItem(): ${message}`);
-      this.channel.send(message);
+  private send(type: MessageType, payload: object) {
+    if (!this.channel) {
+      console.error('PeerConnection::send(): No data channel');
+      return;
     }
+    const message = JSON.stringify({ type, ...payload });
+    console.log(`PeerConnection::send(): ${message}`);
+    this.channel.send(message);
+  }
+
+  public sendShare(share: Share) {
+    this.send('share', { share });
+  }
+
+  public removeShare(id: string) {
+    this.send('removeShare', { id });
   }
 }
