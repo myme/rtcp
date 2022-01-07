@@ -63,11 +63,10 @@ export default function Share(props: Props): JSX.Element {
           case 'connected':
             return (
               <>
-                <span>
-                  <Link to={`/${shareId}`}>
-                    {shareId}
-                  </Link>
-                </span>
+                <Link to={`/${shareId}`} className="button">
+                  {shareId}
+                </Link>
+                {' '}
                 <ShareForm onSubmit={onSend} />
                 <pre>
                   {shares.map(({ direction, item }, idx) => (

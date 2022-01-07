@@ -32,7 +32,7 @@ export default function Form(props: Props): JSX.Element {
   }, [setType]);
 
   return (
-    <form id="client" onSubmit={submit}>
+    <form id="client" className="inline" onSubmit={submit}>
       <span className="group">
         <select value={type} onChange={typeChange}>
           <option value="text">Text</option>

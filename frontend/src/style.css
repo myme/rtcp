@@ -1,9 +1,9 @@
 * {
-  margin: 0.2em;
+  box-sizing: border-box;
+  font-family: Avenir, Helvetica, Arial, sans-serif;
 }
 
 body {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-size: 20px;
@@ -17,7 +17,7 @@ h1 img, h3 img {
 }
 
 h1 {
-  font-size: 40px;
+  font-size: 2em;
 }
 
 a {
@@ -37,10 +37,15 @@ button[disabled] {
   cursor: grabbing;
 }
 
-a.button, button, input, select {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+form.inline {
   display: inline-block;
-  font-size: 14px;
+}
+
+a.button, button, input, select {
+  display: inline-block;
+  margin-left: 0.2em;
+  margin-right: 0.2em;
+  font-size: 0.8em;
   color: #161616;
   background-color: #e9e9ed;
   border-color: #e0e0e0;
