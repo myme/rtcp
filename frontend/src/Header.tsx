@@ -13,11 +13,11 @@ export default function Header(props: Props) {
   if (small) {
     return (
       <Link to="/">
-        <h3>
+        <h2>
           <img src={logo} height="30px" className="App-logo" alt="logo" />
           {' '}
           <span>xchg</span>
-        </h3>
+        </h2>
       </Link>
     );
   }

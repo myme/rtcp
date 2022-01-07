@@ -2,11 +2,10 @@ import React, { useEffect } from 'react';
 import { Outlet } from "react-router";
 
 import ControlSocket from './ControlSocket';
-import PeerConnection, { ConnectionState } from './PeerConnection';
-import { Share } from './Share';
+import PeerConnection, { ConnectionState, Item } from './PeerConnection';
 
 interface Props {
-  addShare(share: Share): void,
+  addShare(item: Item): void,
   setConnectionState(connectionState: ConnectionState): void,
   setControlSocket(controlSocket?: ControlSocket): void;
   setPeerConnection(peerconnection?: PeerConnection): void;
@@ -33,9 +32,7 @@ export default function ConnectionManager(props: Props) {
       onSessionDescription(type, description) {
         cs.broadcast(type, { description });
       },
-      onItem(item) {
-        addShare({ direction: '<', item });
-      },
+      onItem: addShare,
     });
 
     setControlSocket(cs);

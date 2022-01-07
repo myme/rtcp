@@ -7,8 +7,10 @@ import ShareForm from './ShareForm';
 import { ConnectionState, Item as IItem } from './PeerConnection';
 import Item from './Item';
 
+export type Direction = 'inbound' | 'outbound';
 export interface Share {
-  direction: '>' | '<',
+  direction: Direction,
+  id: string,
   item: IItem,
 }
 
@@ -16,7 +18,8 @@ interface Props {
   connectionState: ConnectionState,
   socket?: ControlSocket,
   shares: Share[],
-  onRemoveItem(index: number): void,
+  onCopyItem(id: string): void,
+  onRemoveItem(id: string): void,
   onSend(item: IItem): void,
 }
 
@@ -34,13 +37,12 @@ export default function Share(props: Props): JSX.Element {
     return () => { socket.leaveSession(); };
   }, [socket]);
 
-  const onCopyItem = useCallback((index: number) => async () => {
-    const value = shares[index];
-    await navigator.clipboard.writeText(value.item.value);
+  const onCopyItem = useCallback((id: string) => () => {
+    return props.onCopyItem(id);
   }, [shares]);
 
-  const onRemoveItem = useCallback((index: number) => () => {
-    return props.onRemoveItem(index);
+  const onRemoveItem = useCallback((id: string) => () => {
+    return props.onRemoveItem(id);
   }, []);
 
   return (
@@ -73,12 +75,12 @@ export default function Share(props: Props): JSX.Element {
                 <ShareForm onSubmit={onSend} />
                 {!!shares.length && (
                   <ul className="unstyled">
-                    {shares.map(({ item }, idx) => (
+                    {shares.map(({ id, item }, idx) => (
                       <li key={idx}>
                         <Item
                           item={item}
-                          onCopyItem={onCopyItem(idx)}
-                          onRemoveItem={onRemoveItem(idx)}
+                          onCopyItem={onCopyItem(id)}
+                          onRemoveItem={onRemoveItem(id)}
                         />
                       </li>
                     ))}
