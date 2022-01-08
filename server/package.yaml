@@ -1,8 +1,14 @@
 dependencies:
   - base == 4.*
   - aeson
+  - http-types
   - random
   - text
+  - wai
+  - wai-extra
+  - wai-middleware-static
+  - wai-websockets
+  - warp
   - websockets
 executables:
   xchg-server:

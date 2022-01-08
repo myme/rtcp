@@ -1,18 +1,30 @@
+{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module Main where
 
-import           Control.Monad (forever, forM_)
+import           Control.Monad (forever, forM_, unless, when)
 import           Data.Aeson (FromJSON, Options(constructorTagModifier, sumEncoding, allNullaryToStringTag, fieldLabelModifier), (.:), ToJSON)
 import qualified Data.Aeson as JSON
+import           Data.Functor ((<&>))
 import qualified Data.IORef as Ref
 import qualified Data.List as List
+import qualified Data.Maybe as Maybe
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
 import qualified Log
 import qualified Messages as Msg
+import qualified Network.HTTP.Types as Http
+import qualified Network.Wai as Wai
+import qualified Network.Wai.Handler.Warp as Warp
+import qualified Network.Wai.Handler.WebSockets as WS
+import qualified Network.Wai.Middleware.Rewrite as Rewrite
+import qualified Network.Wai.Middleware.Static as Static
 import qualified Network.WebSockets as WS
+import           System.Environment (getArgs, getProgName)
+import           System.Exit (exitFailure)
 import qualified System.Random as R
+
 
 type ConnectionId = Int
 data Connection = Connection
@@ -123,8 +135,8 @@ broadcast payload conn state = do
         let others = filter (not . sameConnection conn) $ filter (sameSession sessionId) state
         in Right (sessionId, others)
 
-app :: IO Int -> StateRef -> WS.PendingConnection -> IO ()
-app getConnId state req = do
+wsApp :: IO Int -> StateRef -> WS.ServerApp
+wsApp getConnId state req = do
   conn <- Connection <$> getConnId <*> WS.acceptRequest req
   Ref.atomicModifyIORef' state $ \cs -> ((conn, Nothing) : cs, ())
   forever $ do
@@ -144,12 +156,35 @@ app getConnId state req = do
           Right res -> Msg.Success (Just id) (JSON.String $ T.pack res)
     WS.sendTextData (con_ws conn) (JSON.encode response)
 
+wsMiddleware :: IO Int -> StateRef -> Wai.Middleware
+wsMiddleware getNextId stateRef =
+  WS.websocketsOr WS.defaultConnectionOptions (wsApp getNextId stateRef)
+
+routeMiddleware :: Wai.Middleware
+routeMiddleware = Rewrite.rewritePureWithQueries rewrite
+  where rewrite paths _ = case paths of
+          ("assets" : _, _) -> paths
+          _ -> (["index.html"], [])
+
+staticMiddleware :: FilePath -> Wai.Middleware
+staticMiddleware staticRoot = Static.staticPolicy policy
+  where policy = Static.addBase staticRoot
+
+fallbackApp :: Wai.Application
+fallbackApp _ respond = respond $ Wai.responseLBS Http.status400 [] "Not a WebSocket request"
+
 main :: IO ()
 main = do
-  let host = "localhost"
-      port = 3001
-  Log.info $ "Starting server on " <> host <> ":" <> show port
+  let host = "localhost"; port = 3001
+  staticRoot <- getArgs <&> \case
+    (x:_) -> x
+    [] -> "./"
   nextId <- Ref.newIORef 1
   let getNextId = Ref.atomicModifyIORef' nextId $ \id -> (id + 1, id)
   state <- Ref.newIORef []
-  WS.runServer host port (app getNextId state)
+  Log.info $ "Starting server on http://" <> host <> ":" <> show port
+  Warp.run port
+    $ wsMiddleware getNextId state
+    $ routeMiddleware
+    $ staticMiddleware staticRoot
+    fallbackApp
