@@ -23,11 +23,24 @@
         shellHook = a.shellHook + "\n" + v.shellHook;
       }) (pkgs.mkShell {}) envs);
 
+      # Docker image
+      image = pkgs: pkgs.dockerTools.buildLayeredImage {
+        name = "xchg";
+        tag = "latest";
+        contents = with pkgs; [xchg-server xchg-static];
+        config = {
+          Cmd = ["xchg-server"];
+          ExposedPorts = {
+            "8000/tcp" = {};
+          };
+        };
+      };
+
       # Launch development server
       dev = pkgs: pkgs.writeShellScriptBin "dev" ''
         rm -rf ./node_modules
-        ln -s ${pkgs.xchg-frontend.nodeDependencies}/lib/node_modules ./node_modules
-        export PATH="${pkgs.xchg-frontend.nodeDependencies}/bin:$PATH"
+        ln -s ${pkgs.xchg-node.nodeDependencies}/lib/node_modules ./node_modules
+        export PATH="${pkgs.xchg-node.nodeDependencies}/bin:$PATH"
         npx concurrently \
             -n FE,BE \
             -c green,red \
@@ -41,8 +54,8 @@
         src = ./frontend;
         buildInputs = [pkgs.nodejs];
         buildPhase = ''
-          ln -s ${pkgs.xchg-frontend.nodeDependencies}/lib/node_modules ./node_modules
-          export PATH="${pkgs.xchg-frontend.nodeDependencies}/bin:$PATH"
+          ln -s ${pkgs.xchg-node.nodeDependencies}/lib/node_modules ./node_modules
+          export PATH="${pkgs.xchg-node.nodeDependencies}/bin:$PATH"
           npm run build
         '';
         installPhase = ''
@@ -52,17 +65,21 @@
 
     in {
       overlay = (final: prev: {
-        xchg-frontend = final.callPackage ./frontend { nodejs = final.nodejs; };
+        xchg-node = final.callPackage ./frontend { nodejs = final.nodejs; };
+        xchg-static = static final;
         xchg-server = final.haskellPackages.callCabal2nix "xchg-server" ./server {};
       });
       apps = forAllSystems (system: {
         dev = dev nixpkgsFor.${system};
       });
-      packages = forAllSystems (system: {
-        static = static nixpkgsFor.${system};
-        server = nixpkgsFor.${system}.xchg-server;
-      });
-      defaultPackage = forAllSystems (system: self.packages.${system}.xchg);
+      packages = forAllSystems (system:
+        let pkgs = nixpkgsFor.${system};
+        in {
+          image = image pkgs;
+          static = static pkgs;
+          server = pkgs.xchg-server;
+        });
+      defaultPackage = forAllSystems (system: self.packages.${system}.image);
       checks = self.packages;
       devShell = forAllSystems (system:
         mergeEnvs nixpkgsFor.${system} (with self.devShells.${system}; [frontend server]));
@@ -70,7 +87,7 @@
         let pkgs = nixpkgsFor.${system};
             haskellPackages = pkgs.haskellPackages;
         in {
-          frontend = pkgs.xchg-frontend.shell.override {
+          frontend = pkgs.xchg-node.shell.override {
             buildInputs = [pkgs.nodePackages.node2nix];
           };
           server = haskellPackages.shellFor {
