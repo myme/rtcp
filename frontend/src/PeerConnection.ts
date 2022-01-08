@@ -1,6 +1,10 @@
 import { Share } from "./Share";
 
-const PC_CONFIG: RTCConfiguration = {};
+const PC_CONFIG: RTCConfiguration = {
+  iceServers: import.meta.env.VITE_ICE_SERVERS.split(',').filter(s => s).map(s => ({
+    urls: [`stun:${s}`],
+  })),
+};
 
 export type ConnectionState = 'pending' | 'connected' | 'disconnected';
 
