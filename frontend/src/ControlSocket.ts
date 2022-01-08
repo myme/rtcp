@@ -1,5 +1,6 @@
-const protocol = location.protocol === 'http:' ? 'ws:' : 'wss:';
-const SIGNALING_SERVER = `${protocol}//${location.host}`;
+const SIGNALING_SERVER_HOST = import.meta.env.VITE_SIGNALING_SERVER || location.host;
+const SIGNALING_SERVER_PROTO = import.meta.env.DEV ? 'ws:' : 'wss:';
+const SIGNALING_SERVER_WS_URL = `${SIGNALING_SERVER_PROTO}//${SIGNALING_SERVER_HOST}`;
 
 interface RequestHandler {
   resolve(response: string): void;
@@ -42,7 +43,7 @@ export default class ControlSocket {
     return new Promise((resolve, reject) => {
       console.log('ControlSocket::connect()');
 
-      const socket = new WebSocket(SIGNALING_SERVER);
+      const socket = new WebSocket(SIGNALING_SERVER_WS_URL);
 
       socket.addEventListener('open', () => {
         resolve(socket);
