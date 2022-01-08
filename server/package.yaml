@@ -1,3 +1,5 @@
+name: xchg-server
+version: '0.1.0.0'
 dependencies:
   - base == 4.*
   - aeson
@@ -14,3 +16,9 @@ dependencies:
 executables:
   xchg-server:
     main: Main.hs
+    other-modules:
+      - Log
+      - Messages
+    ghc-options:
+      - -Wall
+      - -Werror

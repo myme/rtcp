@@ -17,6 +17,7 @@ import           GHC.Generics
 stripPrefix :: T.Text -> T.Text -> T.Text
 stripPrefix prefix text = fromMaybe text $ T.stripPrefix prefix text
 
+requestJSONOptions :: Options
 requestJSONOptions = JSON.defaultOptions
   { allNullaryToStringTag = False
   , constructorTagModifier = \(c:cs) -> toLower c : cs
@@ -47,6 +48,7 @@ data Response = Success { response_id :: Maybe Int, response_result :: JSON.Valu
               | Failure { response_id :: Maybe Int, response_error :: String }
   deriving (Generic, Show)
 
+responseJSONOptions :: Options
 responseJSONOptions = JSON.defaultOptions
   { fieldLabelModifier = T.unpack . stripPrefix "response_" . T.pack
   , sumEncoding = JSON.UntaggedValue

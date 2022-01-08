@@ -32,7 +32,7 @@
             -n FE,BE \
             -c green,red \
             "cd frontend && npm run frontend" \
-            "cd server && ghcid -r Main"
+            "cd server && hpack && cabal build && ghcid -r Main"
       '';
 
       # Static frontend assets

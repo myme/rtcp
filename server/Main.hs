@@ -3,16 +3,12 @@
 
 module Main where
 
-import           Control.Applicative (optional, (<**>))
-import           Control.Monad (forever, forM_, unless, when)
-import           Data.Aeson (FromJSON, constructorTagModifier, sumEncoding, allNullaryToStringTag, fieldLabelModifier, (.:), ToJSON)
+import           Control.Applicative ((<**>))
+import           Control.Monad (forever, forM_)
 import qualified Data.Aeson as JSON
-import           Data.Functor ((<&>))
 import qualified Data.IORef as Ref
 import qualified Data.List as List
-import qualified Data.Maybe as Maybe
 import qualified Data.Text as T
-import qualified Data.Text.IO as T
 import qualified Log
 import qualified Messages as Msg
 import qualified Network.HTTP.Types as Http
@@ -23,10 +19,8 @@ import qualified Network.Wai.Middleware.Rewrite as Rewrite
 import qualified Network.Wai.Middleware.Static as Static
 import qualified Network.WebSockets as WS
 import qualified Options.Applicative as Opts
-import           System.Environment (getArgs, getProgName)
-import           System.Exit (exitFailure)
+import           Prelude hiding (id)
 import qualified System.Random as R
-import           Text.Read (readMaybe)
 
 
 type ConnectionId = Int
@@ -65,7 +59,7 @@ newSession conn state = do
     Left err -> do
       Log.err $ "FAILURE: newSession: sessionId=" <> sessionId <> ", conn=" <> show conn <> ": " <> err
       pure $ Left err
-    result -> do
+    _ -> do
       Log.info $ "newSession: sessionId=" <> sessionId <> ", conn=" <> show conn
       pure $ Right sessionId
 
@@ -92,9 +86,9 @@ joinSession conn sessionId state = do
         WS.sendTextData (con_ws other) (JSON.encode $ Msg.Notify "peerJoined" Nothing)
       pure $ Right "OK"
   where
-    addConnectionToSession state
-      | not $ hasSession sessionId state = (state, Left $ "No such session: " <> sessionId)
-      | otherwise = ((conn, Just sessionId) : state, Right $ findOthers state)
+    addConnectionToSession state'
+      | not $ hasSession sessionId state' = (state', Left $ "No such session: " <> sessionId)
+      | otherwise = ((conn, Just sessionId) : state', Right $ findOthers state')
     findOthers = map fst . filter (sameSession sessionId)
 
 leaveSession :: Connection -> StateRef -> IO (Either String String)
@@ -104,13 +98,13 @@ leaveSession conn state = do
     Left err -> do
       Log.err $ "FAILURE: leaveSession: conn=" <> show conn <> ": " <> err
       pure $ Left err
-    result -> do
+    result' -> do
       Log.info $ "leaveSession: conn=" <> show conn
-      pure result
+      pure result'
   where
-    removeConnectionFromSession state
-      | not $ hasConnection conn state = (state, Left $ "No such connection: " <> show conn)
-      | otherwise = (map removeConn state, Right "OK")
+    removeConnectionFromSession state'
+      | not $ hasConnection conn state' = (state', Left $ "No such connection: " <> show conn)
+      | otherwise = (map removeConn state', Right "OK")
     removeConn x@(c, _)
       | con_id c == con_id conn = (c, Nothing)
       | otherwise = x
@@ -131,11 +125,11 @@ broadcast payload conn state = do
         WS.sendTextData (con_ws other) (JSON.encode $ Msg.Notify "broadcast" (Just payload))
       pure $ Right "OK"
   where
-    findOthers state = case List.find (sameConnection conn) state of
+    findOthers state' = case List.find (sameConnection conn) state' of
       Nothing -> Left $ "No such connection: conn=" <> show conn
       Just (_, Nothing) -> Left $ "Connection is not in a session: conn=" <> show conn
       Just (_, Just sessionId) ->
-        let others = filter (not . sameConnection conn) $ filter (sameSession sessionId) state
+        let others = filter (not . sameConnection conn) $ filter (sameSession sessionId) state'
         in Right (sessionId, others)
 
 wsApp :: IO Int -> StateRef -> WS.ServerApp
