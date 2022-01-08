@@ -1,4 +1,5 @@
-const SIGNALING_SERVER = 'ws://localhost:3001';
+const protocol = location.protocol === 'http:' ? 'ws:' : 'wss:';
+const SIGNALING_SERVER = `${protocol}//${location.host}`;
 
 interface RequestHandler {
   resolve(response: string): void;
