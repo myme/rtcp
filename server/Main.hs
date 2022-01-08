@@ -3,8 +3,9 @@
 
 module Main where
 
+import           Control.Applicative (optional, (<**>))
 import           Control.Monad (forever, forM_, unless, when)
-import           Data.Aeson (FromJSON, Options(constructorTagModifier, sumEncoding, allNullaryToStringTag, fieldLabelModifier), (.:), ToJSON)
+import           Data.Aeson (FromJSON, constructorTagModifier, sumEncoding, allNullaryToStringTag, fieldLabelModifier, (.:), ToJSON)
 import qualified Data.Aeson as JSON
 import           Data.Functor ((<&>))
 import qualified Data.IORef as Ref
@@ -21,9 +22,11 @@ import qualified Network.Wai.Handler.WebSockets as WS
 import qualified Network.Wai.Middleware.Rewrite as Rewrite
 import qualified Network.Wai.Middleware.Static as Static
 import qualified Network.WebSockets as WS
+import qualified Options.Applicative as Opts
 import           System.Environment (getArgs, getProgName)
 import           System.Exit (exitFailure)
 import qualified System.Random as R
+import           Text.Read (readMaybe)
 
 
 type ConnectionId = Int
@@ -173,15 +176,37 @@ staticMiddleware staticRoot = Static.staticPolicy policy
 fallbackApp :: Wai.Application
 fallbackApp _ respond = respond $ Wai.responseLBS Http.status400 [] "Not a WebSocket request"
 
+data Options = Options
+  { opts_host :: String
+  , opts_port :: Int
+  , opts_static_root :: FilePath
+  }
+
+optionsParser :: Opts.Parser Options
+optionsParser = Options
+  <$> Opts.strOption
+        (Opts.long "host" <> Opts.value "localhost" <> Opts.help "bind to host")
+  <*> Opts.option Opts.auto (
+        Opts.long "port" <> Opts.value 8000 <> Opts.help "listen to port")
+  <*> Opts.strOption (
+        Opts.long "static-root" <> Opts.value "./" <> Opts.help "serve static files from dir")
+
 main :: IO ()
 main = do
-  let host = "localhost"; port = 3001
-  staticRoot <- getArgs <&> \case
-    (x:_) -> x
-    [] -> "./"
+  opts <- Opts.execParser
+    $ Opts.info (optionsParser <**> Opts.helper) (
+        Opts.fullDesc <>
+        Opts.progDesc "xchg server" <>
+        Opts.header "xchg server - exchange stuff between things using WebRTC")
+
+  let host = opts_host opts
+      port = opts_port opts
+      staticRoot = opts_static_root opts
+
   nextId <- Ref.newIORef 1
   let getNextId = Ref.atomicModifyIORef' nextId $ \id -> (id + 1, id)
   state <- Ref.newIORef []
+
   Log.info $ "Starting server on http://" <> host <> ":" <> show port
   Warp.run port
     $ wsMiddleware getNextId state

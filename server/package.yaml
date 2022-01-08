@@ -2,6 +2,7 @@ dependencies:
   - base == 4.*
   - aeson
   - http-types
+  - optparse-applicative
   - random
   - text
   - wai
