@@ -3,8 +3,8 @@
 
 module Main where
 
-import           Control.Applicative ((<**>))
-import           Control.Monad (forever, forM_)
+import Control.Applicative ((<**>))
+import Control.Monad (forM_, forever)
 import qualified Data.Aeson as JSON
 import qualified Data.IORef as Ref
 import qualified Data.List as List
@@ -19,21 +19,23 @@ import qualified Network.Wai.Middleware.Rewrite as Rewrite
 import qualified Network.Wai.Middleware.Static as Static
 import qualified Network.WebSockets as WS
 import qualified Options.Applicative as Opts
-import           Prelude hiding (id)
 import qualified System.Random as R
-
+import Prelude hiding (id)
 
 type ConnectionId = Int
+
 data Connection = Connection
-  { con_id :: ConnectionId
-  , con_ws :: WS.Connection
+  { con_id :: ConnectionId,
+    con_ws :: WS.Connection
   }
 
 instance Show Connection where
   show conn = show (con_id conn)
 
 type SessionId = String
+
 type State = [(Connection, Maybe SessionId)]
+
 type StateRef = Ref.IORef State
 
 hasConnection :: Connection -> State -> Bool
@@ -118,10 +120,12 @@ broadcast payload conn state = do
       pure $ Left err
     Right (sessionId, others) -> do
       forM_ others $ \(other, _) -> do
-        Log.info
-          $  "broadcast: sessionId=" <> sessionId
-          <> ", from=" <> show conn
-          <> ", to=" <> show other
+        Log.info $
+          "broadcast: sessionId=" <> sessionId
+            <> ", from="
+            <> show conn
+            <> ", to="
+            <> show other
         WS.sendTextData (con_ws other) (JSON.encode $ Msg.Notify "broadcast" (Just payload))
       pure $ Right "OK"
   where
@@ -130,7 +134,7 @@ broadcast payload conn state = do
       Just (_, Nothing) -> Left $ "Connection is not in a session: conn=" <> show conn
       Just (_, Just sessionId) ->
         let others = filter (not . sameConnection conn) $ filter (sameSession sessionId) state'
-        in Right (sessionId, others)
+         in Right (sessionId, others)
 
 wsApp :: IO Int -> StateRef -> WS.ServerApp
 wsApp getConnId state req = do
@@ -159,39 +163,48 @@ wsMiddleware getNextId stateRef =
 
 routeMiddleware :: Wai.Middleware
 routeMiddleware = Rewrite.rewritePureWithQueries rewrite
-  where rewrite paths _ = case paths of
-          ("assets" : _, _) -> paths
-          _ -> (["index.html"], [])
+  where
+    rewrite paths _ = case paths of
+      ("assets" : _, _) -> paths
+      _ -> (["index.html"], [])
 
 staticMiddleware :: FilePath -> Wai.Middleware
 staticMiddleware staticRoot = Static.staticPolicy policy
-  where policy = Static.addBase staticRoot
+  where
+    policy = Static.addBase staticRoot
 
 fallbackApp :: Wai.Application
 fallbackApp _ respond = respond $ Wai.responseLBS Http.status400 [] "Not a WebSocket request"
 
 data Options = Options
-  { opts_host :: String
-  , opts_port :: Int
-  , opts_static_root :: FilePath
+  { opts_host :: String,
+    opts_port :: Int,
+    opts_static_root :: FilePath
   }
 
 optionsParser :: Opts.Parser Options
-optionsParser = Options
-  <$> Opts.strOption
-        (Opts.long "host" <> Opts.value "localhost" <> Opts.help "bind to host")
-  <*> Opts.option Opts.auto (
-        Opts.long "port" <> Opts.value 8000 <> Opts.help "listen to port")
-  <*> Opts.strOption (
-        Opts.long "static-root" <> Opts.value "./" <> Opts.help "serve static files from dir")
+optionsParser =
+  Options
+    <$> Opts.strOption
+      (Opts.long "host" <> Opts.value "localhost" <> Opts.help "bind to host")
+    <*> Opts.option
+      Opts.auto
+      ( Opts.long "port" <> Opts.value 8000 <> Opts.help "listen to port"
+      )
+    <*> Opts.strOption
+      ( Opts.long "static-root" <> Opts.value "./" <> Opts.help "serve static files from dir"
+      )
 
 main :: IO ()
 main = do
-  opts <- Opts.execParser
-    $ Opts.info (optionsParser <**> Opts.helper) (
-        Opts.fullDesc <>
-        Opts.progDesc "xchg server" <>
-        Opts.header "xchg server - exchange stuff between things using WebRTC")
+  opts <-
+    Opts.execParser $
+      Opts.info
+        (optionsParser <**> Opts.helper)
+        ( Opts.fullDesc
+            <> Opts.progDesc "xchg server"
+            <> Opts.header "xchg server - exchange stuff between things using WebRTC"
+        )
 
   let host = opts_host opts
       port = opts_port opts
@@ -202,8 +215,9 @@ main = do
   state <- Ref.newIORef []
 
   Log.info $ "Starting server on http://" <> host <> ":" <> show port
-  Warp.run port
-    $ wsMiddleware getNextId state
-    $ routeMiddleware
-    $ staticMiddleware staticRoot
-    fallbackApp
+  Warp.run port $
+    wsMiddleware getNextId state $
+      routeMiddleware $
+        staticMiddleware
+          staticRoot
+          fallbackApp
