@@ -36,6 +36,31 @@
         };
       };
 
+      turn-image = pkgs: pkgs.dockerTools.buildLayeredImage {
+        name = "xchg-turn";
+        tag = "latest";
+        contents = with pkgs; [coturn];
+        config = {
+          Cmd = [
+            "turnserver"
+            "-n"
+            "--no-cli"
+            "--no-tls"
+            "--no-dtls"
+            "--no-stdout-log"
+            "--lt-cred-mech"
+            "--user" "turnuser:turnpassword"
+            "--realm" "turnRealm"
+            "-q" "20" # 100 user sessions
+            "-Q" "300" # 300 total user sessions
+          ];
+          ExposedPorts = {
+            "3478/tcp" = {};
+            "3478/udp" = {};
+          };
+        };
+      };
+
       # Launch development server
       dev = pkgs: pkgs.writeShellScriptBin "dev" ''
         rm -rf ./node_modules
@@ -76,6 +101,7 @@
         let pkgs = nixpkgsFor.${system};
         in {
           image = image pkgs;
+          turn-image = turn-image pkgs;
           static = static pkgs;
           server = pkgs.xchg-server;
         });
