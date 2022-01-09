@@ -34,7 +34,7 @@ export default function Item(props: Props) {
   return (
     <>
       <span>{output}</span>
-      <span className="pull-right">
+      <span>
         <button className="unstyled" onClick={onCopyItem} title="Copy item">
           <Clipboard />
         </button>

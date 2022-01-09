@@ -74,17 +74,20 @@ export default function Share(props: Props): JSX.Element {
                 {' '}
                 <ShareForm onSubmit={onSend} />
                 {!!shares.length && (
-                  <ul className="unstyled">
-                    {shares.map(({ id, item }, idx) => (
-                      <li key={idx}>
-                        <Item
-                          item={item}
-                          onCopyItem={onCopyItem(id)}
-                          onRemoveItem={onRemoveShare(id)}
-                        />
-                      </li>
-                    ))}
-                  </ul>
+                  <>
+                    <hr />
+                    <ul className="unstyled">
+                      {shares.map(({ id, item }, idx) => (
+                        <li key={idx}>
+                          <Item
+                            item={item}
+                            onCopyItem={onCopyItem(id)}
+                            onRemoveItem={onRemoveShare(id)}
+                          />
+                        </li>
+                      ))}
+                    </ul>
+                  </>
                 )}
               </>
             );

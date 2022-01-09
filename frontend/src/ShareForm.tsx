@@ -33,15 +33,15 @@ export default function Form(props: Props): JSX.Element {
 
   return (
     <form id="client" className="inline" onSubmit={submit}>
-      <span className="group">
+      <div className="group">
         <select value={type} onChange={typeChange}>
           <option value="text">Text</option>
           <option value="hidden">Hidden</option>
           <option value="file">File</option>
         </select>
-        <input type={type === 'hidden' ? 'password' : type} value={input} onChange={inputChange} />
-      </span>
-      <button type="submit" disabled={!input.trim().length}>Share</button>
+        <input type={type === 'hidden' ? 'password' : type} placeholder="Input" value={input} onChange={inputChange} />
+        <button type="submit" disabled={!input.trim().length}>Share</button>
+      </div>
     </form>
   );
 }

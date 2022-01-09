@@ -20,12 +20,12 @@ export default function JoinForm(props: Props) {
 
   return (
     <form onSubmit={onFormSubmit}>
-      <span className="group">
-        <input type="text" onChange={onJoinSessionIdChange} />
+      <div className="group">
+        <input type="text" placeholder="Share ID" onChange={onJoinSessionIdChange} />
         <button type="submit" disabled={sessionId.length !== shareIdLength}>
           Join share
         </button>
-      </span>
+      </div>
     </form>
   );
 }
