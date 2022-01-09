@@ -274,6 +274,15 @@ let
         sha512 = "ROn4qvkxP9SyPeHaf7uQC/GPFY6L/OWy9+bd9AwcjOAWQwxRscoEyAUD8qCY5o5iL4jqQwoLk2kaTKJPb/HwzQ==";
       };
     };
+    "@types/node-17.0.8" = {
+      name = "_at_types_slash_node";
+      packageName = "@types/node";
+      version = "17.0.8";
+      src = fetchurl {
+        url = "https://registry.npmjs.org/@types/node/-/node-17.0.8.tgz";
+        sha512 = "YofkM6fGv4gDJq78g4j0mMuGMkZVxZDgtU0JRdx6FgiJDG+0fY0GKVolOV8WqVmEhLCXkQRjwDdKyPxJp/uucg==";
+      };
+    };
     "@types/prop-types-15.7.4" = {
       name = "_at_types_slash_prop-types";
       packageName = "@types/prop-types";
@@ -995,6 +1004,7 @@ let
       sources."@babel/traverse-7.16.5"
       sources."@babel/types-7.16.0"
       sources."@rollup/pluginutils-4.1.2"
+      sources."@types/node-17.0.8"
       sources."@types/prop-types-15.7.4"
       sources."@types/react-17.0.38"
       sources."@types/react-dom-17.0.11"
