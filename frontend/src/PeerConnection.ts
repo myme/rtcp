@@ -2,6 +2,9 @@ import { Share } from "./Share";
 
 const PC_CONFIG: RTCConfiguration = {};
 
+import { getLogger } from "./Logger";
+const logger = getLogger('PeerConnection');
+
 export type ConnectionState = 'pending' | 'connected' | 'disconnected';
 
 export type ItemType = 'text' | 'hidden' | 'file';
@@ -37,7 +40,7 @@ export default class PeerConnection {
   }
 
   public close() {
-    console.log('PeerConnection::close()');
+    logger.log('PeerConnection::close()');
     if (this.channel) {
       this.channel.close();
       delete this.channel;
@@ -52,16 +55,16 @@ export default class PeerConnection {
     try {
       this.pc = new RTCPeerConnection(PC_CONFIG);
       this.pc.onconnectionstatechange = (event) => {
-        console.log('PeerConnection::createPeerConnection(): Peer connection state:', event);
+        logger.log('PeerConnection::createPeerConnection(): Peer connection state:', event);
       };
       this.pc.onicecandidate = (event) => { this.onIceCandidate(event); };
       this.pc.ondatachannel = (event) => {
-        console.log('PeerConnection::createPeerConnection(): Data channel event');
+        logger.log('PeerConnection::createPeerConnection(): Data channel event');
         this.setDataChannel(event.channel);
       };
-      console.log('PeerConnection::createPeerConnection(): Peer connection created');
+      logger.log('PeerConnection::createPeerConnection(): Peer connection created');
     } catch (error) {
-      console.error('PeerConnection::createPeerConnection(): Peer connection failed:', error);
+      logger.error('PeerConnection::createPeerConnection(): Peer connection failed:', error);
     }
   }
 
@@ -97,7 +100,7 @@ export default class PeerConnection {
 
   private handleDataChannelMessage(message: string) {
     try {
-      console.log(`PeerConnection::handleDataChannelMessage(): ${message}`);
+      logger.log(`PeerConnection::handleDataChannelMessage(): ${message}`);
       const data = JSON.parse(message);
 
       if (!data || typeof data.type !== 'string') {
@@ -124,15 +127,15 @@ export default class PeerConnection {
       }
     } catch (error) {
       if (error instanceof Error) {
-        console.error(`PeerConnection::handleDataChannelMessage(): ${error.message}`);
+        logger.error(`PeerConnection::handleDataChannelMessage(): ${error.message}`);
       } else {
-        console.error(`PeerConnection::handleDataChannelMessage(): Invalid message: ${message}`);
+        logger.error(`PeerConnection::handleDataChannelMessage(): Invalid message: ${message}`);
       }
     }
   }
 
   private setDataChannel(channel: RTCDataChannel) {
-    console.log('PeerConnection::setDataChannel()');
+    logger.log('PeerConnection::setDataChannel()');
     this.channel = channel;
     this.channel.onmessage = (event) => {
       this.handleDataChannelMessage(event.data);
@@ -148,13 +151,13 @@ export default class PeerConnection {
 
   private onIceCandidate(event: RTCPeerConnectionIceEvent) {
     if (event.candidate) {
-      console.log('PeerConnection::onIceCandidate(): ICE candidate');
+      logger.log('PeerConnection::onIceCandidate(): ICE candidate');
       this.props.onIceCandidate(event.candidate);
     }
   }
 
   public async sendOffer() {
-    console.log('PeerConnection::sendOffer()');
+    logger.log('PeerConnection::sendOffer()');
     this.createPeerConnection();
     this.createDataChannel();
     const pc = this.assertPeerConnection();
@@ -165,7 +168,7 @@ export default class PeerConnection {
   }
 
   private async sendAnswer() {
-    console.log('PeerConnection::sendAnswer()');
+    logger.log('PeerConnection::sendAnswer()');
     const pc = this.assertPeerConnection();
     const sessionDescription = await pc.createAnswer();
     pc.setLocalDescription(sessionDescription);
@@ -174,11 +177,11 @@ export default class PeerConnection {
 
   private send(type: MessageType, payload: object) {
     if (!this.channel) {
-      console.error('PeerConnection::send(): No data channel');
+      logger.error('PeerConnection::send(): No data channel');
       return;
     }
     const message = JSON.stringify({ type, ...payload });
-    console.log(`PeerConnection::send(): ${message}`);
+    logger.log(`PeerConnection::send(): ${message}`);
     this.channel.send(message);
   }
 

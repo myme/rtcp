@@ -12,6 +12,9 @@ interface Props {
   onBroadcast(message: any): void,
 }
 
+import { getLogger } from './Logger';
+const logger = getLogger('ControlSocket');
+
 export default class ControlSocket {
   private requestId = 0;
   private requestMap = new Map<number, RequestHandler>();
@@ -19,7 +22,7 @@ export default class ControlSocket {
   private socket?: WebSocket;
 
   public constructor(readonly props: Props) {
-    console.log('new ControlSocket()');
+    logger.info('new ControlSocket()');
   }
 
   private async getSocket(): Promise<WebSocket> {
@@ -41,7 +44,7 @@ export default class ControlSocket {
 
   private connect(): Promise<WebSocket> {
     return new Promise((resolve, reject) => {
-      console.log('ControlSocket::connect()');
+      logger.info('ControlSocket::connect()');
 
       const socket = new WebSocket(SIGNALING_SERVER_WS_URL);
 
@@ -61,23 +64,23 @@ export default class ControlSocket {
 
   public close() {
     if (this.socket) {
-      console.log('ControlSocket::close()');
+      logger.info('ControlSocket::close()');
       this.socket.close();
       delete this.socket;
     }
   }
 
   private handleMessage(data: string) {
-    console.log(`ControlSocket::handleMessage(): Got message: ${data}`);
+    logger.info(`ControlSocket::handleMessage(): Got message: ${data}`);
     const message = JSON.parse(data);
     if (!message.id) {
       switch (message.method) {
         case 'peerJoined':
-          console.log('ControlSocket::handleMessage(): Peer joined');
+          logger.info('ControlSocket::handleMessage(): Peer joined');
           this.props.onPeerJoined();
           return;
         case 'broadcast':
-          console.log('ControlSocket::handleMessage(): Broadcast');
+          logger.info('ControlSocket::handleMessage(): Broadcast');
           this.props.onBroadcast(message.params);
           return;
         default:
@@ -107,7 +110,7 @@ export default class ControlSocket {
 
     const message = { id: requestId, method, ...params };
     const messageText = JSON.stringify(message);
-    console.log(`ControlSocket::request(): Sending mesage: ${messageText}`);
+    logger.info(`ControlSocket::request(): Sending mesage: ${messageText}`);
     socket.send(messageText);
 
     return new Promise((resolve, reject) => {
@@ -117,7 +120,7 @@ export default class ControlSocket {
 
   public async broadcast(type: string, data: object) {
     const result = await this.request('broadcast', { params: { type, ...data } });
-    console.log(`ControlSocket::broadcast(): response: ${result}`);
+    logger.info(`ControlSocket::broadcast(): response: ${result}`);
   }
 
   public async newSession(): Promise<string> {
@@ -133,7 +136,7 @@ export default class ControlSocket {
 
   public async joinSession(sessionId: string) {
     if (this.sessionId) {
-      console.log(`ControlSocket::joinSession(): Already joined session: ${this.sessionId}`);
+      logger.info(`ControlSocket::joinSession(): Already joined session: ${this.sessionId}`);
       return;
     }
 

@@ -11,6 +11,10 @@ import PeerConnection, { ConnectionState, Item } from './PeerConnection';
 
 import './style.css';
 
+import { setLevel, getLogger } from './Logger';
+setLevel('log');
+const logger = getLogger('App');
+
 export default function App() {
   const [controlSocket, setControlSocket] = useState<ControlSocket>();
   const [peerConnection, setPeerConnection] = useState<PeerConnection>();
@@ -39,7 +43,7 @@ export default function App() {
   const onRemoveLocalShare = useCallback((id: string) => {
     setShares(shares => shares.filter(share => share.id !== id));
     if (!peerConnection) {
-      console.error('App::onLocalRemoveShare(): No peer connection');
+      logger.error('App::onLocalRemoveShare(): No peer connection');
       return;
     }
     peerConnection.removeShare(id);
@@ -52,7 +56,7 @@ export default function App() {
   const onSend = useCallback((item: Item) => {
     const share = addShare('outbound', item);
     if (!peerConnection) {
-      console.error('App::onSend(): No peer connection');
+      logger.error('App::onSend(): No peer connection');
       return;
     }
     peerConnection.sendShare(share);
