@@ -10,7 +10,7 @@ export default function JoinForm(props: Props) {
   const [sessionId, setSessionId] = useState('');
 
   const onJoinSessionIdChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
-    setSessionId(event.target.value);
+    setSessionId(event.target.value.slice(0, 6));
   }, [setSessionId]);
 
   const onFormSubmit = useCallback((event: FormEvent) => {
@@ -21,7 +21,13 @@ export default function JoinForm(props: Props) {
   return (
     <form onSubmit={onFormSubmit}>
       <div className="group">
-        <input type="text" placeholder="Share ID" onChange={onJoinSessionIdChange} />
+        <input
+          type="number"
+          placeholder="Share ID"
+          value={sessionId}
+          onChange={onJoinSessionIdChange}
+          autoFocus
+        />
         <button type="submit" disabled={sessionId.length !== shareIdLength}>
           Join share
         </button>

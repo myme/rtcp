@@ -115,6 +115,15 @@ button.unstyled {
   }
 }
 
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    display: none;
+}
+
+input[type=number] {
+    -moz-appearance: textfield;
+}
+
 ul.unstyled {
   padding: 0;
   list-style: none;

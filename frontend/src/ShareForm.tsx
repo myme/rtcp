@@ -39,7 +39,13 @@ export default function Form(props: Props): JSX.Element {
           <option value="hidden">Hidden</option>
           <option value="file">File</option>
         </select>
-        <input type={type === 'hidden' ? 'password' : type} placeholder="Input" value={input} onChange={inputChange} />
+        <input
+          type={type === 'hidden' ? 'password' : type}
+          placeholder="Input"
+          value={input}
+          onChange={inputChange}
+          autoFocus
+        />
         <button type="submit" disabled={!input.trim().length}>Share</button>
       </div>
     </form>

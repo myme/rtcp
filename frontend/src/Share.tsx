@@ -45,6 +45,8 @@ export default function Share(props: Props): JSX.Element {
     return props.onRemoveShare(id);
   }, [props.onRemoveShare]);
 
+  const prettyShareId = shareId && shareId.replace(/^(...)(...)$/, '$1 $2');
+
   return (
     <>
       <Header small={connectionState === 'connected'} />
@@ -54,7 +56,7 @@ export default function Share(props: Props): JSX.Element {
             return (
               <h1>
                 <Link to={`/${shareId}`}>
-                  {shareId}
+                  {prettyShareId}
                 </Link>
               </h1>
             );
@@ -69,7 +71,7 @@ export default function Share(props: Props): JSX.Element {
             return (
               <>
                 <Link to={`/${shareId}`} className="button">
-                  {shareId}
+                  {prettyShareId}
                 </Link>
                 {' '}
                 <ShareForm onSubmit={onSend} />
