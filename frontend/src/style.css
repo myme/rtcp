@@ -29,8 +29,9 @@ main {
   min-width: 350px;
 }
 
-h1 img, h3 img {
+h1 img.app-logo, h2 img.app-logo {
   margin-bottom: -0.15em;
+  height: 1em;
 }
 
 h1 {

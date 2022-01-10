@@ -14,8 +14,7 @@ export default function Header(props: Props) {
     return (
       <Link to="/">
         <h2>
-          <img src={logo} height="30px" className="App-logo" alt="logo" />
-          {' '}
+          <img src={logo} className="app-logo" alt="logo" />
           <span>xchg</span>
         </h2>
       </Link>
@@ -24,8 +23,10 @@ export default function Header(props: Props) {
 
   return (
     <Link to="/">
-      <img src={logo} height="60px" className="App-logo" alt="logo" />
-      <h1>xchg</h1>
+      <h1>
+        <img src={logo} className="app-logo" alt="logo" />
+        <span>xchg</span>
+      </h1>
     </Link>
   )
 }
