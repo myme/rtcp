@@ -17,7 +17,7 @@
     rm -rf ./node_modules
     ln -s ${xchg.frontend.nodeDependencies}/lib/node_modules ./node_modules
     export PATH="${xchg.frontend.nodeDependencies}/bin:$PATH"
-    npx concurrently \
+    nix develop --command npx concurrently \
         -n FE,BE \
         -c green,red \
         "cd frontend && npm run frontend" \
