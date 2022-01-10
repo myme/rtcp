@@ -151,6 +151,9 @@ ul.unstyled li:last-child {
 
 ul.unstyled li :first-child {
   flex: 1 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 18em;
 }
 
 ul.unstyled li button {
