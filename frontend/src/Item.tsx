@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Item } from './PeerConnection';
+import { Item as IItem } from './PeerConnection';
 
 function Clipboard() {
   return (
@@ -21,7 +21,7 @@ function Trash() {
 }
 
 interface Props {
-  item: Item,
+  item: IItem,
   onCopyItem(): void,
   onRemoveItem(): void,
 }
