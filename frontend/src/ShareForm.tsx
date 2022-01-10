@@ -5,6 +5,10 @@ interface Props {
   onSubmit(item: Item): void,
 }
 
+function capitalize(input: string) {
+  return input.substring(0, 1).toUpperCase() + input.substring(1);
+}
+
 export default function Form(props: Props): JSX.Element {
   const { onSubmit } = props;
   const [input, setInput] = useState('');
@@ -26,18 +30,20 @@ export default function Form(props: Props): JSX.Element {
     switch (value) {
       case 'text':
       case 'hidden':
-      case 'file':
+      // case 'file':
         setType(value);
     }
   }, [setType]);
+
+  const types: ItemType[] = ['text', 'hidden', /* 'file' */];
 
   return (
     <form id="client" className="inline" onSubmit={submit}>
       <div className="group">
         <select value={type} onChange={typeChange}>
-          <option value="text">Text</option>
-          <option value="hidden">Hidden</option>
-          <option value="file">File</option>
+          {types.map(type => (
+            <option key={type} value={type}>{capitalize(type)}</option>
+          ))}
         </select>
         <input
           type={type === 'hidden' ? 'password' : type}

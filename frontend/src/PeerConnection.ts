@@ -7,7 +7,7 @@ const logger = getLogger('PeerConnection');
 
 export type ConnectionState = 'pending' | 'connected' | 'disconnected';
 
-export type ItemType = 'text' | 'hidden' | 'file';
+export type ItemType = 'text' | 'hidden'; // | 'file';
 
 export interface Item {
   type: ItemType,
