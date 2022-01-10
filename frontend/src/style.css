@@ -103,6 +103,12 @@ button.unstyled {
     margin-left: 0;
     border-left: none;
     border-radius: 0;
+    position: relative;
+    z-index: 2;
+  }
+
+  form .group :focus {
+    z-index: 3;
   }
 
   form .group :first-child {
