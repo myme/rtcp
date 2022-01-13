@@ -34,6 +34,7 @@
 
       in rec {
         apps = { dev = pkgs.xchg.dev; };
+        defaultApp = apps.dev;
         packages = {
           image = pkgs.xchg.image;
           server = pkgs.xchg.server.server;
