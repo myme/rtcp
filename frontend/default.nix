@@ -1,6 +1,14 @@
-{ stdenv, callPackage, nodejs, nodePackages }:
+{ stdenv, callPackage, nodejs, nodePackages, writeShellScriptBin }:
 let
   node = callPackage ./nix { inherit nodejs; };
+  node2nix = writeShellScriptBin "node2nix" ''
+    ${nodePackages.node2nix}/bin/node2nix \
+      --development \
+      -l package-lock.json \
+      -c ./nix/default.nix \
+      -o ./nix/node-packages.nix \
+      -e ./nix/node-env.nix
+  '';
 in {
   nodeDependencies = node.nodeDependencies;
   static = stdenv.mkDerivation {
@@ -17,6 +25,6 @@ in {
     '';
   };
   shell = node.shell.override {
-    buildInputs = [ nodePackages.node2nix ];
+    buildInputs = [ node2nix ];
   };
 }
