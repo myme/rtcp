@@ -33,6 +33,7 @@
           }) (pkgs.mkShell { }) envs);
 
       in rec {
+        inherit overlay;
         apps = { dev = pkgs.xchg.dev; };
         defaultApp = apps.dev;
         packages = {

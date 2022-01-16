@@ -20,7 +20,7 @@
     nix develop --command npx concurrently \
         -n FE,BE \
         -c green,red \
-        "cd frontend && npm run frontend" \
+        "cd frontend && npm start" \
         "cd server && hpack && cabal build && ghcid -r Main"
   '';
 }

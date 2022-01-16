@@ -2,9 +2,9 @@
   "name": "xchg",
   "version": "0.0.0",
   "scripts": {
-    "frontend": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "start": "vite"
   },
   "devDependencies": {
     "@types/node": "^17.0.8",
