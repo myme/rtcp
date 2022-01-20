@@ -1,4 +1,4 @@
-{ dockerTools, writeShellScriptBin, xchg }:
+{ concurrently, dockerTools, writeShellScript, writeShellScriptBin, xchg }:
 
 {
   # Docker image
@@ -13,14 +13,18 @@
   };
 
   # Launch development server
-  dev = writeShellScriptBin "dev" ''
+  dev = let
+    run-server = writeShellScript "run-server" ''
+      cd server && hpack && cabal build && ghcid -r Main
+    '';
+  in writeShellScriptBin "dev" ''
     rm -rf ./node_modules
     ln -s ${xchg.frontend.nodeDependencies}/lib/node_modules ./node_modules
     export PATH="${xchg.frontend.nodeDependencies}/bin:$PATH"
-    nix develop --command npx concurrently \
-        -n FE,BE \
-        -c green,red \
-        "cd frontend && npm start" \
-        "cd server && hpack && cabal build && ghcid -r Main"
+    ${concurrently}/bin/concurrently \
+      -n FE,BE \
+      -c green,red \
+      "cd frontend && npm start" \
+      "nix develop .#server -c ${run-server}"
   '';
 }
