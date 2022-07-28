@@ -1,5 +1,10 @@
 #+TITLE: WebRTC notes
 
+* TODOs
+** TODO Add QR code
+
+Display a QR code with link to the share.
+
 * Network setup (NAT, ICE, STUN)
 
 ** ICE
@@ -35,7 +40,6 @@ of network address translators (NAT) or firewalls for multimedia applications.
 #+end_quote
 
 *** [[https://github.com/coturn/coturn][coturn - Free open source implementation of TURN and STUN Server]]
-
 * Signalling
 * WebRTC
 
