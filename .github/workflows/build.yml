@@ -2,9 +2,9 @@ name: "Build & Push to Docker Hub"
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ "master" ]
+    branches: [ "main" ]
     
 env:
   tarball_name: xchg.tar.gz
