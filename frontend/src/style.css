@@ -88,6 +88,10 @@ hr {
   margin-right: auto;
 }
 
+p {
+  margin: 1em;
+}
+
 a.button:hover, button:hover {
   background-color: #d0d0d7;
   text-decoration: none;

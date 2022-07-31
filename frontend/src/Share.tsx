@@ -1,5 +1,6 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import { QRCodeSVG } from 'qrcode.react';
 
 import Header from './Header';
 import ControlSocket from './ControlSocket';
@@ -26,6 +27,7 @@ interface Props {
 export default function Share(props: Props): JSX.Element {
   const { connectionState, socket, shares, onSend } = props;
   const { shareId } = useParams();
+  const [fullUrl, setFullUrl] = useState(`${location}`);
 
   useEffect(() => {
     if (!socket) {
@@ -47,6 +49,10 @@ export default function Share(props: Props): JSX.Element {
 
   const prettyShareId = shareId && shareId.replace(/^(...)(...)$/, '$1 $2');
 
+  useEffect(() => {
+    setFullUrl(`${location}`);
+  }, [shareId]);
+
   return (
     <>
       <Header small={connectionState === 'connected'} />
@@ -55,10 +61,15 @@ export default function Share(props: Props): JSX.Element {
           case 'pending':
             return (
               <h1>
-                <Link to={`/${shareId}`}>
-                  {prettyShareId}
-                </Link>
-              </h1>
+                <p>
+                  <Link to={`/${shareId}`}>
+                    {prettyShareId}
+                  </Link>
+                </p>
+                <p>
+                  <QRCodeSVG value={fullUrl} />
+                </p>
+                </h1>
             );
           case 'disconnected':
             return (

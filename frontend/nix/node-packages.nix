@@ -805,6 +805,15 @@ let
         sha512 = "jBDboWM8qpaqwkMwItqTQTiFikhs/67OYVvblFFTM7MrZjt6yMKd6r2kgXizEbTTljacm4NldIlZnhbjr84QYg==";
       };
     };
+    "qrcode.react-3.1.0" = {
+      name = "qrcode.react";
+      packageName = "qrcode.react";
+      version = "3.1.0";
+      src = fetchurl {
+        url = "https://registry.npmjs.org/qrcode.react/-/qrcode.react-3.1.0.tgz";
+        sha512 = "oyF+Urr3oAMUG/OiOuONL3HXM+53wvuH3mtIWQrYmsXoAq0DkvZp2RYUWFSMFtbdOpuS++9v+WAkzNVkMlNW6Q==";
+      };
+    };
     "react-17.0.2" = {
       name = "react";
       packageName = "react";
@@ -1063,6 +1072,7 @@ let
       sources."picocolors-1.0.0"
       sources."picomatch-2.3.0"
       sources."postcss-8.4.5"
+      sources."qrcode.react-3.1.0"
       sources."react-17.0.2"
       sources."react-dom-17.0.2"
       sources."react-refresh-0.11.0"
