@@ -4,7 +4,7 @@ let
 
   node2nix = writeShellScriptBin "node2nix" ''
     ${nodePackages.node2nix}/bin/node2nix \
-      -14 \
+      -18 \
       --development \
       -l package-lock.json \
       -c ./nix/default.nix \

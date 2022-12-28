@@ -15,9 +15,7 @@
         overlay = (final: prev: {
           xchg = (final.callPackage ./. { } // {
             server = final.callPackage ./server { };
-            frontend = final.callPackage ./frontend {
-              nodejs = final.nodejs-14_x;
-            };
+            frontend = final.callPackage ./frontend { };
           });
         });
 
