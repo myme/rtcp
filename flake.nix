@@ -2,7 +2,7 @@
   # inspired by: https://serokell.io/blog/practical-nix-flakes#packaging-existing-applications
   description = "xchg - Exchange stuff between things using WebRTC";
 
-  inputs.nixpkgs.url = "nixpkgs/nixos-21.11";
+  inputs.nixpkgs.url = "nixpkgs/nixos-22.11";
   inputs.flake-utils.url = "github:numtide/flake-utils";
 
   outputs = { self, nixpkgs, flake-utils }:
@@ -15,7 +15,9 @@
         overlay = (final: prev: {
           xchg = (final.callPackage ./. { } // {
             server = final.callPackage ./server { };
-            frontend = final.callPackage ./frontend { };
+            frontend = final.callPackage ./frontend {
+              nodejs = final.nodejs-14_x;
+            };
           });
         });
 
