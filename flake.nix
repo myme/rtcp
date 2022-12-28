@@ -34,7 +34,12 @@
 
       in rec {
         inherit overlay;
-        apps = { dev = pkgs.xchg.dev; };
+        apps = {
+          dev = {
+            type = "app";
+            program = "${pkgs.xchg.dev}/bin/dev";
+          };
+        };
         defaultApp = apps.dev;
         packages = {
           image = pkgs.xchg.image;

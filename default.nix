@@ -21,6 +21,6 @@
       -n FE,BE \
       -c green,red \
       "cd frontend && npm start" \
-      "cd server && hpack && cabal build && ghcid -r Main"
+      "cd server && hpack && cabal build && ghcid -r"
   '';
 }
