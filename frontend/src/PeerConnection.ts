@@ -1,7 +1,5 @@
 import { Share } from "./Share";
 
-const PC_CONFIG: RTCConfiguration = {};
-
 import { getLogger } from "./Logger";
 const logger = getLogger('PeerConnection');
 
@@ -28,6 +26,7 @@ export interface Props {
 export default class PeerConnection {
   private channel?: RTCDataChannel;
   private pc?: RTCPeerConnection;
+  private rtcConfig: RTCConfiguration = {};
 
   constructor(readonly props: Props) {
   }
@@ -51,9 +50,13 @@ export default class PeerConnection {
     }
   }
 
+  public setIceServers(iceServers: RTCIceServer[]) {
+    this.rtcConfig.iceServers = iceServers;
+  }
+
   private createPeerConnection() {
     try {
-      this.pc = new RTCPeerConnection(PC_CONFIG);
+      this.pc = new RTCPeerConnection(this.rtcConfig);
       this.pc.onconnectionstatechange = (event) => {
         logger.log('PeerConnection::createPeerConnection(): Peer connection state:', event);
       };

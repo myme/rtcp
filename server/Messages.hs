@@ -5,23 +5,24 @@ module Messages
  ( Request(..)
  , RequestWithId(..)
  , Response(..)
+ , stripPrefix
  ) where
 
-import           Data.Aeson (FromJSON, Options(constructorTagModifier, sumEncoding, allNullaryToStringTag, fieldLabelModifier), (.:), ToJSON)
+import Data.Aeson (FromJSON, Options (allNullaryToStringTag, constructorTagModifier, fieldLabelModifier, sumEncoding), ToJSON, (.:))
 import qualified Data.Aeson as JSON
-import           Data.Char (toLower)
-import           Data.Maybe (fromMaybe)
-import qualified Data.Text as T
-import           GHC.Generics
+import Data.Char (toLower)
+import qualified Data.List as List
+import Data.Maybe (fromMaybe)
+import GHC.Generics
 
-stripPrefix :: T.Text -> T.Text -> T.Text
-stripPrefix prefix text = fromMaybe text $ T.stripPrefix prefix text
+stripPrefix :: String -> String -> String
+stripPrefix prefix text = fromMaybe text $ List.stripPrefix prefix text
 
 requestJSONOptions :: Options
 requestJSONOptions = JSON.defaultOptions
   { allNullaryToStringTag = False
   , constructorTagModifier = \(c:cs) -> toLower c : cs
-  , fieldLabelModifier = T.unpack . stripPrefix "request_" . T.pack
+  , fieldLabelModifier = stripPrefix "request_"
   , sumEncoding = JSON.TaggedObject "method" "method"
   }
 
@@ -34,7 +35,8 @@ instance FromJSON RequestWithId where
   parseJSON = JSON.withObject "RequestWithId" $ \obj ->
     RequestWithId <$> (obj .: "id") <*> JSON.parseJSON (JSON.toJSON obj)
 
-data Request = NewSession
+data Request = GetIceConfig { request_hostname :: String }
+             | NewSession
              | JoinSession { request_sessionId :: String }
              | LeaveSession
              | Broadcast { request_params :: JSON.Value }
@@ -44,15 +46,17 @@ instance FromJSON Request where
   parseJSON = JSON.genericParseJSON requestJSONOptions
 
 data Response = Success { response_id :: Maybe Int, response_result :: JSON.Value }
+
               | Notify { response_method :: String, response_params :: Maybe JSON.Value }
               | Failure { response_id :: Maybe Int, response_error :: String }
   deriving (Generic, Show)
 
 responseJSONOptions :: Options
 responseJSONOptions = JSON.defaultOptions
-  { fieldLabelModifier = T.unpack . stripPrefix "response_" . T.pack
+  { fieldLabelModifier = stripPrefix "response_"
   , sumEncoding = JSON.UntaggedValue
   }
 
 instance ToJSON Response where
+  toJSON = JSON.genericToJSON responseJSONOptions
   toEncoding = JSON.genericToEncoding responseJSONOptions

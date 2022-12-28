@@ -18,6 +18,9 @@ export default function ConnectionManager(props: Props) {
 
   useEffect(() => {
     const cs = new ControlSocket({
+      onIceServersUpdated(iceServers) {
+        pc.setIceServers(iceServers);
+      },
       onPeerJoined() {
         pc.sendOffer();
       },

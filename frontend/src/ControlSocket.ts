@@ -8,6 +8,7 @@ interface RequestHandler {
 }
 
 interface Props {
+  onIceServersUpdated(iceServers: RTCIceServer[]): void,
   onPeerJoined(): void,
   onBroadcast(message: any): void,
 }
@@ -39,6 +40,10 @@ export default class ControlSocket {
     }
 
     this.socket = await this.connect();
+
+    const iceConfig = await this.getIceConfig(location.hostname);
+    this.props.onIceServersUpdated(iceConfig);
+
     return this.socket;
   }
 
@@ -116,6 +121,21 @@ export default class ControlSocket {
     return new Promise((resolve, reject) => {
       this.requestMap.set(requestId, { resolve, reject });
     });
+  }
+
+  async getIceConfig(hostname: string): Promise<RTCIceServer[]> {
+    const result = await this.request('getIceConfig', { hostname });
+
+    if (!Array.isArray(result)) {
+      throw new Error(`Invalid "getIceConfig" response: ${result}`);
+    }
+
+    return result.map(({ urls, user, pass }) => ({
+      urls,
+      username: user || undefined,
+      credential: pass || undefined,
+      credentialType: (user && pass) ? 'password' : undefined,
+    }))
   }
 
   public async broadcast(type: string, data: object) {

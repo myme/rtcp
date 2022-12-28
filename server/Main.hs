@@ -1,14 +1,17 @@
-{-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module Main where
+module Main (main) where
 
 import Control.Applicative ((<**>))
 import Control.Monad (forM_, forever)
+import Data.Aeson (ToJSON)
 import qualified Data.Aeson as JSON
 import qualified Data.IORef as Ref
 import qualified Data.List as List
+import Data.Text (Text)
 import qualified Data.Text as T
+import GHC.Generics (Generic)
 import qualified Log
 import qualified Messages as Msg
 import qualified Network.HTTP.Types as Http
@@ -32,6 +35,25 @@ data Connection = Connection
 instance Show Connection where
   show conn = show (con_id conn)
 
+data IceConfig = IceConfig
+  { ice_urls :: [Text],
+    ice_user :: Maybe Text,
+    ice_pass :: Maybe Text
+  }
+  deriving (Generic)
+
+iceJSONOptions :: JSON.Options
+iceJSONOptions =
+  JSON.defaultOptions
+    { JSON.fieldLabelModifier = Msg.stripPrefix "ice_",
+      JSON.omitNothingFields = True,
+      JSON.sumEncoding = JSON.UntaggedValue
+    }
+
+instance ToJSON IceConfig where
+  toJSON = JSON.genericToJSON iceJSONOptions
+  toEncoding = JSON.genericToEncoding iceJSONOptions
+
 type SessionId = String
 
 type State = [(Connection, Maybe SessionId)]
@@ -52,6 +74,10 @@ sameSession sessionId = (== Just sessionId) . snd
 
 leftPad :: Int -> Char -> String -> String
 leftPad n c s = replicate (n - length s) c <> s
+
+getIceConfig :: String -> [IceConfig]
+getIceConfig hostname =
+  [IceConfig ["stun:" <> T.pack hostname <> ":3478"] Nothing Nothing]
 
 newSession :: Connection -> StateRef -> IO (Either String String)
 newSession conn state = do
@@ -121,7 +147,8 @@ broadcast payload conn state = do
     Right (sessionId, others) -> do
       forM_ others $ \(other, _) -> do
         Log.info $
-          "broadcast: sessionId=" <> sessionId
+          "broadcast: sessionId="
+            <> sessionId
             <> ", from="
             <> show conn
             <> ", to="
@@ -148,14 +175,17 @@ wsApp getConnId state req = do
         pure $ Msg.Failure Nothing err
       Right (Msg.RequestWithId id request) -> do
         result <- case request of
-          Msg.NewSession -> newSession conn state
-          Msg.JoinSession sessionId -> joinSession conn sessionId state
-          Msg.LeaveSession -> leaveSession conn state
-          Msg.Broadcast payload -> broadcast payload conn state
+          Msg.GetIceConfig hostname -> pure . Right . JSON.toJSON $ getIceConfig hostname
+          Msg.NewSession -> jsonString <$> newSession conn state
+          Msg.JoinSession sessionId -> jsonString <$> joinSession conn sessionId state
+          Msg.LeaveSession -> jsonString <$> leaveSession conn state
+          Msg.Broadcast payload -> jsonString <$> broadcast payload conn state
         pure $ case result of
           Left err -> Msg.Failure (Just id) err
-          Right res -> Msg.Success (Just id) (JSON.String $ T.pack res)
+          Right res -> Msg.Success (Just id) res
     WS.sendTextData (con_ws conn) (JSON.encode response)
+  where
+    jsonString = fmap (JSON.String . T.pack)
 
 wsMiddleware :: IO Int -> StateRef -> Wai.Middleware
 wsMiddleware getNextId stateRef =
