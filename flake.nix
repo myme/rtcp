@@ -32,26 +32,29 @@
             shellHook = a.shellHook + "\n" + v.shellHook;
           }) (pkgs.mkShell { }) envs);
 
-      in rec {
-        inherit overlay;
         apps = {
           dev = {
             type = "app";
             program = "${pkgs.xchg.dev}/bin/dev";
           };
         };
-        defaultApp = apps.dev;
+
         packages = {
           image = pkgs.xchg.image;
           server = pkgs.xchg.server.server;
           static = pkgs.xchg.frontend.static;
         };
-        defaultPackage = packages.image;
-        checks = packages;
-        devShell = mergeEnvs pkgs (with devShells; [ frontend server ]);
+
         devShells = {
           frontend = pkgs.xchg.frontend.shell;
           server = pkgs.xchg.server.shell;
         };
+
+      in {
+        inherit apps devShells overlay packages;
+        defaultApp = apps.dev;
+        defaultPackage = packages.image;
+        checks = packages;
+        devShell = mergeEnvs pkgs (builtins.attrValues devShells);
       });
 }
