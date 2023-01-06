@@ -1,7 +1,8 @@
 module Log
- ( info
- , err
- ) where
+  ( info,
+    err,
+  )
+where
 
 import System.IO (hPutStrLn, stderr)
 
