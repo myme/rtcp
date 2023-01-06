@@ -6,31 +6,36 @@
   inputs.flake-utils.url = "github:numtide/flake-utils";
 
   outputs = { self, nixpkgs, flake-utils }:
-    flake-utils.lib.eachDefaultSystem (system:
+    let
+      overlay = final: prev: {
+        xchg = (final.callPackage ./. { } // {
+          server = final.callPackage ./server { };
+          frontend = final.callPackage ./frontend { };
+          turnserver = final.callPackage ./turnserver { };
+        });
+      };
+
+      # https://www.reddit.com/r/NixOS/comments/ce9cmu/comment/eu1c7sh/?utm_source=share&utm_medium=web2x&context=3
+      # https://gist.github.com/adisbladis/2a44cded73e048458a815b5822eea195
+      mergeEnvs = pkgs: envs:
+        pkgs.mkShell (builtins.foldl' (a: v: {
+          buildInputs = a.buildInputs ++ v.buildInputs;
+          nativeBuildInputs = a.nativeBuildInputs ++ v.nativeBuildInputs;
+          propagatedBuildInputs = a.propagatedBuildInputs
+            ++ v.propagatedBuildInputs;
+          propagatedNativeBuildInputs = a.propagatedNativeBuildInputs
+            ++ v.propagatedNativeBuildInputs;
+          shellHook = a.shellHook + "\n" + v.shellHook;
+        }) (pkgs.mkShell { }) envs);
+
+    in {
+      overlays.default = overlay;
+    } // flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = import nixpkgs {
           inherit system;
           overlays = [ overlay ];
         };
-        overlay = (final: prev: {
-          xchg = (final.callPackage ./. { } // {
-            server = final.callPackage ./server { };
-            frontend = final.callPackage ./frontend { };
-          });
-        });
-
-        # https://www.reddit.com/r/NixOS/comments/ce9cmu/comment/eu1c7sh/?utm_source=share&utm_medium=web2x&context=3
-        # https://gist.github.com/adisbladis/2a44cded73e048458a815b5822eea195
-        mergeEnvs = pkgs: envs:
-          pkgs.mkShell (builtins.foldl' (a: v: {
-            buildInputs = a.buildInputs ++ v.buildInputs;
-            nativeBuildInputs = a.nativeBuildInputs ++ v.nativeBuildInputs;
-            propagatedBuildInputs = a.propagatedBuildInputs
-              ++ v.propagatedBuildInputs;
-            propagatedNativeBuildInputs = a.propagatedNativeBuildInputs
-              ++ v.propagatedNativeBuildInputs;
-            shellHook = a.shellHook + "\n" + v.shellHook;
-          }) (pkgs.mkShell { }) envs);
 
         apps = {
           dev = {
@@ -51,7 +56,7 @@
         };
 
       in {
-        inherit apps devShells overlay packages;
+        inherit apps devShells packages;
         defaultApp = apps.dev;
         defaultPackage = packages.image;
         checks = packages;
