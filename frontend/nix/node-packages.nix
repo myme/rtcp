@@ -978,8 +978,8 @@ let
     };
   };
   args = {
-    name = "xchg";
-    packageName = "xchg";
+    name = "rtcp";
+    packageName = "rtcp";
     version = "0.0.0";
     src = ./..;
     dependencies = [

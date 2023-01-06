@@ -15,7 +15,7 @@ export default function Header(props: Props) {
       <Link to="/">
         <h2>
           <img src={logo} className="app-logo" alt="logo" />
-          <span>xchg</span>
+          <span>rtcp</span>
         </h2>
       </Link>
     );
@@ -25,7 +25,7 @@ export default function Header(props: Props) {
     <Link to="/">
       <h1>
         <img src={logo} className="app-logo" alt="logo" />
-        <span>xchg</span>
+        <span>rtcp</span>
       </h1>
     </Link>
   )

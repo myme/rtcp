@@ -1,6 +1,6 @@
 {
   # inspired by: https://serokell.io/blog/practical-nix-flakes#packaging-existing-applications
-  description = "xchg - Exchange stuff between things using WebRTC";
+  description = "rtcp - Exchange stuff between things using WebRTC";
 
   inputs.nixpkgs.url = "nixpkgs/nixos-22.11";
   inputs.flake-utils.url = "github:numtide/flake-utils";
@@ -8,7 +8,7 @@
   outputs = { self, nixpkgs, flake-utils }:
     let
       overlay = final: prev: {
-        xchg = (final.callPackage ./. { } // {
+        rtcp = (final.callPackage ./. { } // {
           server = final.callPackage ./server { };
           frontend = final.callPackage ./frontend { };
           turnserver = final.callPackage ./turnserver { };
@@ -40,19 +40,19 @@
         apps = {
           dev = {
             type = "app";
-            program = "${pkgs.xchg.dev}/bin/dev";
+            program = "${pkgs.rtcp.dev}/bin/dev";
           };
         };
 
         packages = {
-          image = pkgs.xchg.image;
-          server = pkgs.xchg.server.server;
-          static = pkgs.xchg.frontend.static;
+          image = pkgs.rtcp.image;
+          server = pkgs.rtcp.server.server;
+          static = pkgs.rtcp.frontend.static;
         };
 
         devShells = {
-          frontend = pkgs.xchg.frontend.shell;
-          server = pkgs.xchg.server.shell;
+          frontend = pkgs.rtcp.frontend.shell;
+          server = pkgs.rtcp.server.shell;
         };
 
       in {

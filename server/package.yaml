@@ -1,4 +1,4 @@
-name: xchg-server
+name: rtcp-server
 version: '0.1.0.0'
 dependencies:
   - base == 4.*
@@ -14,7 +14,7 @@ dependencies:
   - warp
   - websockets
 executables:
-  xchg-server:
+  rtcp-server:
     main: Main.hs
     other-modules:
       - Log

@@ -7,7 +7,7 @@ on:
     branches: [ "main" ]
     
 env:
-  tarball_name: xchg.tar.gz
+  tarball_name: rtcp.tar.gz
     
 jobs:
   build:
@@ -48,5 +48,5 @@ jobs:
         name: Push image to Docker Hub
         run: |
           docker load < ${{ env.tarball_name }}
-          docker tag xchg:latest myme/xchg:latest
-          docker push myme/xchg:latest
+          docker tag rtcp:latest myme/rtcp:latest
+          docker push myme/rtcp:latest

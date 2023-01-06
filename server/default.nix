@@ -1,6 +1,6 @@
 { haskellPackages }:
 rec {
-  server = haskellPackages.callCabal2nix "xchg-server" ./. {};
+  server = haskellPackages.callCabal2nix "rtcp-server" ./. {};
   shell = haskellPackages.shellFor {
     packages = p: [server];
     withHoogle = true;

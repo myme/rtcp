@@ -1,13 +1,13 @@
-{ concurrently, dockerTools, writeShellScriptBin, xchg }:
+{ concurrently, dockerTools, writeShellScriptBin, rtcp }:
 
 {
   # Docker image
   image = dockerTools.buildLayeredImage {
-    name = "xchg";
+    name = "rtcp";
     tag = "latest";
-    contents = with xchg; [ server.server frontend.static ];
+    contents = with rtcp; [ server.server frontend.static ];
     config = {
-      Cmd = [ "xchg-server" ];
+      Cmd = [ "rtcp-server" ];
       ExposedPorts = { "8000/tcp" = { }; };
     };
   };
@@ -15,8 +15,8 @@
   # Launch development server
   dev = writeShellScriptBin "dev" ''
     rm -rf ./node_modules
-    ln -s ${xchg.frontend.nodeDependencies}/lib/node_modules ./node_modules
-    export PATH="${xchg.frontend.nodeDependencies}/bin:$PATH"
+    ln -s ${rtcp.frontend.nodeDependencies}/lib/node_modules ./node_modules
+    export PATH="${rtcp.frontend.nodeDependencies}/bin:$PATH"
     nix develop --command ${concurrently}/bin/concurrently \
       -n FE,BE \
       -c green,red \

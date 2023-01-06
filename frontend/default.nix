@@ -14,7 +14,7 @@ let
 in {
   inherit (generated) nodeDependencies;
   static = stdenv.mkDerivation {
-    name = "xchg-frontend";
+    name = "rtcp-frontend";
     src = ./.;
     buildInputs = [ nodejs ];
     buildPhase = ''

@@ -253,8 +253,8 @@ main = do
       Opts.info
         (optionsParser <**> Opts.helper)
         ( Opts.fullDesc
-            <> Opts.progDesc "xchg server"
-            <> Opts.header "xchg server - exchange stuff between things using WebRTC"
+            <> Opts.progDesc "rtcp server"
+            <> Opts.header "rtcp server - exchange stuff between things using WebRTC"
         )
 
   let host = opts_host opts
