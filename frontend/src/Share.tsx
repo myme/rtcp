@@ -55,9 +55,9 @@ export default function Share(props: Props): JSX.Element {
 
   return (
     <>
-      <Header small={connectionState === 'connected'} />
+      <Header small={connectionState.status === 'connected'} />
       {(function(): JSX.Element {
-        switch (connectionState) {
+        switch (connectionState.status) {
           case 'pending':
             return (
               <h1>
@@ -75,6 +75,13 @@ export default function Share(props: Props): JSX.Element {
             return (
               <>
                 <h2>Peer disconnected</h2>
+                <Link className="button" to="/">Home</Link>
+              </>
+            );
+          case 'error':
+            return (
+              <>
+                <h2>{connectionState.error || "Something went wrong"}</h2>
                 <Link className="button" to="/">Home</Link>
               </>
             );

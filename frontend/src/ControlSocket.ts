@@ -8,6 +8,7 @@ interface RequestHandler {
 }
 
 interface Props {
+  onError(error: string): void,
   onIceServersUpdated(iceServers: RTCIceServer[]): void,
   onPeerJoined(): void,
   onBroadcast(message: any): void,
@@ -101,9 +102,12 @@ export default class ControlSocket {
     this.requestMap.delete(message.id);
 
     if (message.error) {
+      this.props.onError(message.error);
       handler.reject(message.error);
     } else if (!message.result) {
-      handler.reject(`Missing request result: ${data}`);
+      const message = `Missing request result: ${data}`;
+      this.props.onError(message);
+      handler.reject(message);
     } else {
       handler.resolve(message.result);
     }

@@ -1,10 +1,12 @@
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module Main (main) where
 
 import Control.Applicative ((<**>))
-import Control.Monad (forM_, forever)
+import Control.Exception (catch)
+import Control.Monad (forM_)
 import Data.Aeson (ToJSON)
 import qualified Data.Aeson as JSON
 import qualified Data.IORef as Ref
@@ -116,7 +118,9 @@ joinSession conn sessionId state = do
   where
     addConnectionToSession state'
       | not $ hasSession sessionId state' = (state', Left $ "No such session: " <> sessionId)
-      | otherwise = ((conn, Just sessionId) : state', Right $ findOthers state')
+      | otherwise =
+        let (newState, result) = setConnectionSessionId conn sessionId state'
+        in (newState, result >> Right (findOthers state'))
     findOthers = map fst . filter (sameSession sessionId)
 
 leaveSession :: Connection -> StateRef -> IO (Either String String)
@@ -167,25 +171,42 @@ wsApp :: IO Int -> StateRef -> WS.ServerApp
 wsApp getConnId state req = do
   conn <- Connection <$> getConnId <*> WS.acceptRequest req
   Ref.atomicModifyIORef' state $ \cs -> ((conn, Nothing) : cs, ())
-  forever $ do
-    msg <- JSON.eitherDecode <$> WS.receiveData (con_ws conn)
-    response <- case msg of
-      Left err -> do
-        Log.err $ "FAILURE: app: " <> err
-        pure $ Msg.Failure Nothing err
-      Right (Msg.RequestWithId id request) -> do
-        result <- case request of
-          Msg.GetIceConfig hostname -> pure . Right . JSON.toJSON $ getIceConfig hostname
-          Msg.NewSession -> jsonString <$> newSession conn state
-          Msg.JoinSession sessionId -> jsonString <$> joinSession conn sessionId state
-          Msg.LeaveSession -> jsonString <$> leaveSession conn state
-          Msg.Broadcast payload -> jsonString <$> broadcast payload conn state
-        pure $ case result of
-          Left err -> Msg.Failure (Just id) err
-          Right res -> Msg.Success (Just id) res
-    WS.sendTextData (con_ws conn) (JSON.encode response)
+  go conn
   where
     jsonString = fmap (JSON.String . T.pack)
+    go conn = do
+      wsRead <- (Right . JSON.eitherDecode <$> WS.receiveData (con_ws conn)) `catch` handleWSError state conn
+      case wsRead of
+        Left err -> Log.err $ "FAILURE: WebSocket: " <> err
+        Right msg -> do
+          response <- case msg of
+            Left err -> do
+              Log.err $ "FAILURE: handle message: " <> err
+              pure $ Msg.Failure Nothing err
+            Right (Msg.RequestWithId id request) -> do
+              result <- case request of
+                Msg.GetIceConfig hostname -> pure . Right . JSON.toJSON $ getIceConfig hostname
+                Msg.NewSession -> jsonString <$> newSession conn state
+                Msg.JoinSession sessionId -> jsonString <$> joinSession conn sessionId state
+                Msg.LeaveSession -> jsonString <$> leaveSession conn state
+                Msg.Broadcast payload -> jsonString <$> broadcast payload conn state
+              pure $ case result of
+                Left err -> Msg.Failure (Just id) err
+                Right res -> Msg.Success (Just id) res
+          WS.sendTextData (con_ws conn) (JSON.encode response)
+          go conn
+
+handleWSError :: StateRef -> Connection -> WS.ConnectionException -> IO (Either String a)
+handleWSError state conn = \case
+  WS.CloseRequest _ _ -> do
+    cleanupConnection
+    pure $ Left "Connection closing"
+  WS.ConnectionClosed -> do
+    cleanupConnection
+    pure $ Left "Connection closed"
+  _ -> undefined
+  where
+    cleanupConnection = Ref.atomicModifyIORef' state $ \cs -> (filter ((/= con_id conn) . con_id . fst) cs, ())
 
 wsMiddleware :: IO Int -> StateRef -> Wai.Middleware
 wsMiddleware getNextId stateRef =

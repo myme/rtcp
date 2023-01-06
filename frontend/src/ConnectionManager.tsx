@@ -18,6 +18,9 @@ export default function ConnectionManager(props: Props) {
 
   useEffect(() => {
     const cs = new ControlSocket({
+      onError(error: string) {
+        setConnectionState({ status: 'error', error });
+      },
       onIceServersUpdated(iceServers) {
         pc.setIceServers(iceServers);
       },
@@ -51,7 +54,7 @@ export default function ConnectionManager(props: Props) {
       setTimeout(() => {
         cs.close();
         pc.close();
-        setConnectionState('pending');
+        setConnectionState({ status: 'pending' });
       }, 0);
     }
   }, []);

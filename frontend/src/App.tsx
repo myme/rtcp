@@ -18,7 +18,7 @@ const logger = getLogger('App');
 export default function App() {
   const [controlSocket, setControlSocket] = useState<ControlSocket>();
   const [peerConnection, setPeerConnection] = useState<PeerConnection>();
-  const [connectionState, setConnectionState] = useState<ConnectionState>('pending');
+  const [connectionState, setConnectionState] = useState<ConnectionState>({ status: 'pending' });
   const [shares, setShares] = useState<IShare[]>([]);
 
   const addShare = useCallback((direction: Direction, item: Item) => {

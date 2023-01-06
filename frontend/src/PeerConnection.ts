@@ -3,7 +3,11 @@ import { Share } from "./Share";
 import { getLogger } from "./Logger";
 const logger = getLogger('PeerConnection');
 
-export type ConnectionState = 'pending' | 'connected' | 'disconnected';
+export type ConnectionStatus = 'pending' | 'connected' | 'disconnected' | 'error';
+export interface ConnectionState {
+  status: ConnectionStatus;
+  error?: string;
+}
 
 export type ItemType = 'text' | 'hidden'; // | 'file';
 
@@ -16,7 +20,7 @@ type MessageType = 'share' | 'removeShare';
 type SessionType = 'offer' | 'answer';
 
 export interface Props {
-  onConnectionStateChange: (state: ConnectionState) => void,
+  onConnectionStateChange(state: ConnectionState): void,
   onIceCandidate(candidate: RTCIceCandidate): void,
   onSessionDescription(type: SessionType, description: RTCSessionDescriptionInit): void,
   onShare(share: Share): void,
@@ -144,10 +148,10 @@ export default class PeerConnection {
       this.handleDataChannelMessage(event.data);
     };
     this.channel.onopen = () => {
-      this.props.onConnectionStateChange('connected');
+      this.props.onConnectionStateChange({ status: 'connected' });
     };
     this.channel.onclose = () => {
-      this.props.onConnectionStateChange('disconnected');
+      this.props.onConnectionStateChange({ status: 'disconnected' });
       this.close();
     };
   }
@@ -167,7 +171,7 @@ export default class PeerConnection {
     const sessionDescription = await pc.createOffer();
     pc.setLocalDescription(sessionDescription);
     this.props.onSessionDescription('offer', sessionDescription);
-    this.props.onConnectionStateChange('pending');
+    this.props.onConnectionStateChange({ status: 'pending' });
   }
 
   private async sendAnswer() {
