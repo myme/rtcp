@@ -43,7 +43,7 @@ export default class PeerConnection {
   }
 
   public close() {
-    logger.log('PeerConnection::close()');
+    logger.debug('PeerConnection::close()');
     if (this.channel) {
       this.channel.close();
       delete this.channel;
@@ -62,14 +62,14 @@ export default class PeerConnection {
     try {
       this.pc = new RTCPeerConnection(this.rtcConfig);
       this.pc.onconnectionstatechange = (event) => {
-        logger.log('PeerConnection::createPeerConnection(): Peer connection state:', event);
+        logger.debug('PeerConnection::createPeerConnection(): Peer connection state:', event);
       };
       this.pc.onicecandidate = (event) => { this.onIceCandidate(event); };
       this.pc.ondatachannel = (event) => {
-        logger.log('PeerConnection::createPeerConnection(): Data channel event');
+        logger.debug('PeerConnection::createPeerConnection(): Data channel event');
         this.setDataChannel(event.channel);
       };
-      logger.log('PeerConnection::createPeerConnection(): Peer connection created');
+      logger.debug('PeerConnection::createPeerConnection(): Peer connection created');
     } catch (error) {
       logger.error('PeerConnection::createPeerConnection(): Peer connection failed:', error);
     }
@@ -107,7 +107,7 @@ export default class PeerConnection {
 
   private handleDataChannelMessage(message: string) {
     try {
-      logger.log(`PeerConnection::handleDataChannelMessage(): ${message}`);
+      logger.debug(`PeerConnection::handleDataChannelMessage(): ${message}`);
       const data = JSON.parse(message);
 
       if (!data || typeof data.type !== 'string') {
@@ -142,7 +142,7 @@ export default class PeerConnection {
   }
 
   private setDataChannel(channel: RTCDataChannel) {
-    logger.log('PeerConnection::setDataChannel()');
+    logger.debug('PeerConnection::setDataChannel()');
     this.channel = channel;
     this.channel.onmessage = (event) => {
       this.handleDataChannelMessage(event.data);
@@ -158,13 +158,13 @@ export default class PeerConnection {
 
   private onIceCandidate(event: RTCPeerConnectionIceEvent) {
     if (event.candidate) {
-      logger.log('PeerConnection::onIceCandidate(): ICE candidate');
+      logger.debug('PeerConnection::onIceCandidate(): ICE candidate');
       this.props.onIceCandidate(event.candidate);
     }
   }
 
   public async sendOffer() {
-    logger.log('PeerConnection::sendOffer()');
+    logger.debug('PeerConnection::sendOffer()');
     this.createPeerConnection();
     this.createDataChannel();
     const pc = this.assertPeerConnection();
@@ -175,7 +175,7 @@ export default class PeerConnection {
   }
 
   private async sendAnswer() {
-    logger.log('PeerConnection::sendAnswer()');
+    logger.debug('PeerConnection::sendAnswer()');
     const pc = this.assertPeerConnection();
     const sessionDescription = await pc.createAnswer();
     pc.setLocalDescription(sessionDescription);
@@ -188,7 +188,7 @@ export default class PeerConnection {
       return;
     }
     const message = JSON.stringify({ type, ...payload });
-    logger.log(`PeerConnection::send(): ${message}`);
+    logger.debug(`PeerConnection::send(): ${message}`);
     this.channel.send(message);
   }
 
