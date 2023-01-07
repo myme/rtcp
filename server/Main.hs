@@ -1,16 +1,16 @@
 {-# LANGUAGE DeriveGeneric #-}
-{-# LANGUAGE LambdaCase #-}
-{-# LANGUAGE OverloadedStrings #-}
 
 module Main (main) where
 
 import Control.Applicative ((<**>))
 import Control.Exception (catch)
-import Control.Monad (forM_)
+import Control.Monad (forM_, void, (>=>))
 import Data.Aeson (ToJSON)
 import qualified Data.Aeson as JSON
 import qualified Data.IORef as Ref
 import qualified Data.List as List
+import Data.Map.Strict (Map)
+import qualified Data.Map.Strict as Map
 import Data.Text (Text)
 import qualified Data.Text as T
 import GHC.Generics (Generic)
@@ -58,15 +58,40 @@ instance ToJSON IceConfig where
 
 type SessionId = String
 
-type State = [(Connection, Maybe SessionId)]
+type SessionPin = String
+
+data Session = Session
+  { session_id :: SessionId,
+    session_pin :: SessionPin
+  }
+  deriving (Generic, Show)
+
+sessionJSONOptions :: JSON.Options
+sessionJSONOptions =
+  JSON.defaultOptions
+    { JSON.fieldLabelModifier = Msg.stripPrefix "session_",
+      JSON.omitNothingFields = True,
+      JSON.sumEncoding = JSON.UntaggedValue
+    }
+
+instance ToJSON Session where
+  toJSON = JSON.genericToJSON sessionJSONOptions
+  toEncoding = JSON.genericToEncoding sessionJSONOptions
+
+type Sessions = Map SessionId Session
+
+type Connections = [(Connection, Maybe SessionId)]
+
+data State = State
+  { connections :: Connections,
+    sessions :: Sessions
+  }
+  deriving (Show)
 
 type StateRef = Ref.IORef State
 
 hasConnection :: Connection -> State -> Bool
-hasConnection conn = any ((== con_id conn) . con_id . fst)
-
-hasSession :: SessionId -> State -> Bool
-hasSession sessionId = any ((== Just sessionId) . snd)
+hasConnection conn = any ((== con_id conn) . con_id . fst) . connections
 
 sameConnection :: Connection -> (Connection, a) -> Bool
 sameConnection conn = (== con_id conn) . con_id . fst
@@ -81,69 +106,91 @@ getIceConfig :: String -> [IceConfig]
 getIceConfig hostname =
   [IceConfig ["stun:" <> T.pack hostname <> ":3478"] Nothing Nothing]
 
-newSession :: Connection -> StateRef -> IO (Either String String)
-newSession conn state = do
+newSession :: Connection -> StateRef -> IO (Either String Session)
+newSession conn stateRef = do
   sessionId <- leftPad 6 '0' . show <$> R.randomRIO (0, 999999 :: Int)
-  result <- Ref.atomicModifyIORef' state (setConnectionSessionId conn sessionId)
+  sessionPin <- leftPad 4 '0' . show <$> R.randomRIO (0, 9999 :: Int)
+  let session = Session sessionId sessionPin
+  result <- Ref.atomicModifyIORef' stateRef (tryUpdate $ addSession session >=> addConnectionToSession conn session)
   case result of
     Left err -> do
       Log.err $ "FAILURE: newSession: sessionId=" <> sessionId <> ", conn=" <> show conn <> ": " <> err
       pure $ Left err
     _ -> do
       Log.info $ "newSession: sessionId=" <> sessionId <> ", conn=" <> show conn
-      pure $ Right sessionId
+      pure . Right $ session
 
-setConnectionSessionId :: Connection -> SessionId -> State -> (State, Either String String)
-setConnectionSessionId conn sessionId state
-  | not $ hasConnection conn state = (state, Left $ "No such connection: " <> show conn)
-  | otherwise = (map setSessionId state, Right "OK")
+tryUpdate :: (State -> Either String State) -> State -> (State, Either String State)
+tryUpdate f state = case f state of
+  Left err -> (state, Left err)
+  Right newState -> (newState, Right newState)
+
+addSession :: Session -> State -> Either String State
+addSession session (State cs ss)
+  | Map.member (session_id session) ss = Left $ "Session already exists: " <> show session
+  | otherwise = Right $ State cs (Map.insert (session_id session) session ss)
+
+addConnectionToSession :: Connection -> Session -> State -> Either String State
+addConnectionToSession conn (Session id' pin) state@(State cs ss)
+  | not $ hasConnection conn state = Left $ "No such connection: " <> show conn
+  | not $ Map.member id' ss = Left $ "No such session: " <> id'
+  | not hasValidPin = Left $ "Invalid PIN for session: " <> id'
+  | otherwise = Right $ State (map setConnSessionId cs) ss
   where
-    setSessionId x@(c, _)
-      | con_id c == con_id conn = (c, Just sessionId)
-      | otherwise = x
+    hasValidPin = (== Just pin) $ session_pin <$> Map.lookup id' ss
+    setConnSessionId c@(other, _)
+      | con_id other == con_id conn = (other, Just id')
+      | otherwise = c
 
-joinSession :: Connection -> SessionId -> StateRef -> IO (Either String String)
-joinSession conn sessionId state = do
-  result <- Ref.atomicModifyIORef' state addConnectionToSession
+joinSession :: Connection -> Session -> StateRef -> IO (Either String ())
+joinSession conn session state = do
+  result <- Ref.atomicModifyIORef' state (tryUpdate $ addConnectionToSession conn session)
   case result of
     Left err -> do
-      Log.err $ "FAILURE: joinSession: sessionId=" <> sessionId <> ", conn=" <> show conn <> ": " <> err
+      Log.err $
+        "FAILURE: joinSession: sessionId=" <> session_id session <> ", conn=" <> show conn <> ": " <> err
       pure $ Left err
-    Right others -> do
-      Log.info $ "joinSession: sessionId=" <> sessionId <> ", conn=" <> show conn
+    Right state' -> do
+      Log.info $
+        "joinSession: sessionId=" <> session_id session <> ", conn=" <> show conn
+      let isOther c = not (sameConnection conn c) && sameSession (session_id session) c
+          others = map fst . filter isOther $ connections state'
       forM_ others $ \other -> do
         Log.info $ "joinSession: notifyJoin conn=" <> show conn
         WS.sendTextData (con_ws other) (JSON.encode $ Msg.Notify "peerJoined" Nothing)
-      pure $ Right "OK"
-  where
-    addConnectionToSession state'
-      | not $ hasSession sessionId state' = (state', Left $ "No such session: " <> sessionId)
-      | otherwise =
-        let (newState, result) = setConnectionSessionId conn sessionId state'
-        in (newState, result >> Right (findOthers state'))
-    findOthers = map fst . filter (sameSession sessionId)
+      pure $ Right ()
 
-leaveSession :: Connection -> StateRef -> IO (Either String String)
-leaveSession conn state = do
-  result <- Ref.atomicModifyIORef' state removeConnectionFromSession
+leaveSession :: Connection -> StateRef -> IO (Either String ())
+leaveSession conn stateRef = do
+  result <- Ref.atomicModifyIORef' stateRef (tryUpdate $ removeConnection conn)
   case result of
     Left err -> do
       Log.err $ "FAILURE: leaveSession: conn=" <> show conn <> ": " <> err
       pure $ Left err
-    result' -> do
+    _ -> do
       Log.info $ "leaveSession: conn=" <> show conn
-      pure result'
+      pure $ Right ()
+
+removeConnection :: Connection -> State -> Either String State
+removeConnection conn state@(State cs ss)
+  | not $ hasConnection conn state = Left $ "No such connection: " <> show conn
+  | otherwise = case List.find (sameConnection conn) cs of
+      Just (_, Just sessionId) ->
+        let newConnections = map unsetSessionId cs
+            newSessions =
+              if any ((== Just sessionId) . snd) cs
+                then ss
+                else Map.delete sessionId ss
+         in Right $ State newConnections newSessions
+      _ -> Left $ "Connection is not attached to a session: " <> show conn
   where
-    removeConnectionFromSession state'
-      | not $ hasConnection conn state' = (state', Left $ "No such connection: " <> show conn)
-      | otherwise = (map removeConn state', Right "OK")
-    removeConn x@(c, _)
+    unsetSessionId x@(c, _)
       | con_id c == con_id conn = (c, Nothing)
       | otherwise = x
 
 broadcast :: JSON.Value -> Connection -> StateRef -> IO (Either String String)
 broadcast payload conn state = do
-  result <- findOthers <$> Ref.readIORef state
+  result <- findOthers . connections <$> Ref.readIORef state
   case result of
     Left err -> do
       Log.err $ "FAILURE: broadcast: " <> err
@@ -168,14 +215,16 @@ broadcast payload conn state = do
          in Right (sessionId, others)
 
 wsApp :: IO Int -> StateRef -> WS.ServerApp
-wsApp getConnId state req = do
+wsApp getConnId stateRef req = do
   conn <- Connection <$> getConnId <*> WS.acceptRequest req
-  Ref.atomicModifyIORef' state $ \cs -> ((conn, Nothing) : cs, ())
+  Ref.atomicModifyIORef' stateRef $ \state -> (addConnection conn state, ())
   go conn
   where
-    jsonString = fmap (JSON.String . T.pack)
+    addConnection conn state@(State cs _) = state {connections = (conn, Nothing) : cs}
+    toJSON :: (Functor f, ToJSON a) => f a -> f JSON.Value
+    toJSON = fmap JSON.toJSON
     go conn = do
-      wsRead <- (Right . JSON.eitherDecode <$> WS.receiveData (con_ws conn)) `catch` handleWSError state conn
+      wsRead <- (Right . JSON.eitherDecode <$> WS.receiveData (con_ws conn)) `catch` handleWSError stateRef conn
       case wsRead of
         Left err -> Log.err $ "FAILURE: WebSocket: " <> err
         Right msg -> do
@@ -186,10 +235,10 @@ wsApp getConnId state req = do
             Right (Msg.RequestWithId id request) -> do
               result <- case request of
                 Msg.GetIceConfig hostname -> pure . Right . JSON.toJSON $ getIceConfig hostname
-                Msg.NewSession -> jsonString <$> newSession conn state
-                Msg.JoinSession sessionId -> jsonString <$> joinSession conn sessionId state
-                Msg.LeaveSession -> jsonString <$> leaveSession conn state
-                Msg.Broadcast payload -> jsonString <$> broadcast payload conn state
+                Msg.NewSession -> toJSON <$> newSession conn stateRef
+                Msg.JoinSession id' pin -> toJSON <$> joinSession conn (Session id' pin) stateRef
+                Msg.LeaveSession -> toJSON <$> leaveSession conn stateRef
+                Msg.Broadcast payload -> toJSON <$> broadcast payload conn stateRef
               pure $ case result of
                 Left err -> Msg.Failure (Just id) err
                 Right res -> Msg.Success (Just id) res
@@ -206,7 +255,7 @@ handleWSError state conn = \case
     pure $ Left "Connection closed"
   _ -> undefined
   where
-    cleanupConnection = Ref.atomicModifyIORef' state $ \cs -> (filter ((/= con_id conn) . con_id . fst) cs, ())
+    cleanupConnection = void $ Ref.atomicModifyIORef' state (tryUpdate $ removeConnection conn)
 
 wsMiddleware :: IO Int -> StateRef -> Wai.Middleware
 wsMiddleware getNextId stateRef =
@@ -263,7 +312,7 @@ main = do
 
   nextId <- Ref.newIORef 1
   let getNextId = Ref.atomicModifyIORef' nextId $ \id -> (id + 1, id)
-  state <- Ref.newIORef []
+  state <- Ref.newIORef (State [] Map.empty)
 
   Log.info $ "Starting server on http://" <> host <> ":" <> show port
   Warp.run port $

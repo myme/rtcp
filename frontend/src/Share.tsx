@@ -1,12 +1,17 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { QRCodeSVG } from 'qrcode.react';
 
 import Header from './Header';
-import ControlSocket from './ControlSocket';
+import { Session } from './ControlSocket';
+import PinForm from './PinForm';
 import ShareForm from './ShareForm';
 import { ConnectionState, Item as IItem } from './PeerConnection';
 import Item from './Item';
+import { getLogger } from './Logger';
+import { useControlSocket } from './ConnectionManager';
+
+const logger = getLogger('Share');
 
 export type Direction = 'inbound' | 'outbound';
 export interface Share {
@@ -17,27 +22,21 @@ export interface Share {
 
 interface Props {
   connectionState: ConnectionState,
-  socket?: ControlSocket,
+  session?: Session,
   shares: Share[],
   onCopyItem(id: string): void,
   onRemoveShare(id: string): void,
   onSend(item: IItem): void,
 }
 
-export default function Share(props: Props): JSX.Element {
-  const { connectionState, socket, shares, onSend } = props;
-  const { shareId } = useParams();
-  const [fullUrl, setFullUrl] = useState(`${location}`);
+function prettifyShareId(shareId: string) {
+  return shareId.replace(/^(...)(...)$/, '$1 $2');
+}
 
-  useEffect(() => {
-    if (!socket) {
-      return;
-    }
-    if (shareId) {
-      socket.joinSession(shareId);
-    }
-    return () => { socket.leaveSession(); };
-  }, [socket]);
+export default function Share(props: Props): JSX.Element {
+  const { connectionState, session, shares, onSend } = props;
+  const controlSocket = useControlSocket();
+  const { shareId } = useParams();
 
   const onCopyItem = useCallback((id: string) => () => {
     return props.onCopyItem(id);
@@ -47,30 +46,54 @@ export default function Share(props: Props): JSX.Element {
     return props.onRemoveShare(id);
   }, [props.onRemoveShare]);
 
-  const prettyShareId = shareId && shareId.replace(/^(...)(...)$/, '$1 $2');
+  if (!shareId) {
+    logger.error('Invalid app state, no share id');
+    return (
+      <h1>
+        {'Something went wrong :('}
+      </h1>
+    );
+  }
 
-  useEffect(() => {
-    setFullUrl(`${location}`);
-  }, [shareId]);
+  const onConnectWrapper = (sharePin: string) => {
+    if (!controlSocket) {
+      logger.error('No control socket!');
+      return;
+    }
+    controlSocket.joinSession({ id: shareId, pin: sharePin });
+  };
 
   return (
     <>
       <Header small={connectionState.status === 'connected'} />
-      {(function(): JSX.Element {
+      {(function (): JSX.Element {
         switch (connectionState.status) {
           case 'pending':
-            return (
-              <h1>
-                <p>
-                  <Link to={`/${shareId}`}>
-                    {prettyShareId}
-                  </Link>
-                </p>
-                <p>
-                  <QRCodeSVG value={fullUrl} />
-                </p>
+            // TODO: Don't nest in H1
+            return !session
+              ? (
+                <>
+                  <h1>
+                    {`Connect to share: ${prettifyShareId(shareId)}`}
+                  </h1>
+                  <PinForm onSubmit={onConnectWrapper} />
+                </>
+              ) : (
+                <h1>
+                  <p>
+                    Share ID:
+                    <Link to={`/${session.id}`}>
+                      {prettifyShareId(session.id)}
+                    </Link>
+                  </p>
+                  <p>
+                    {`PIN: ${session?.pin}`}
+                  </p>
+                  <p>
+                    <QRCodeSVG value={`${location}`} />
+                  </p>
                 </h1>
-            );
+              );
           case 'disconnected':
             return (
               <>
@@ -86,31 +109,33 @@ export default function Share(props: Props): JSX.Element {
               </>
             );
           case 'connected':
-            return (
-              <>
-                <Link to={`/${shareId}`} className="button">
-                  {prettyShareId}
-                </Link>
-                {' '}
-                <ShareForm onSubmit={onSend} />
-                {!!shares.length && (
-                  <>
-                    <hr />
-                    <ul className="unstyled">
-                      {shares.map(({ id, item }, idx) => (
-                        <li key={idx}>
-                          <Item
-                            item={item}
-                            onCopyItem={onCopyItem(id)}
-                            onRemoveItem={onRemoveShare(id)}
-                          />
-                        </li>
-                      ))}
-                    </ul>
-                  </>
-                )}
-              </>
-            );
+            return !session
+              ? <div>spin spin</div>
+              : (
+                <>
+                  <Link to={`/${session.id}`} className="button">
+                    {prettifyShareId(session.id)}
+                  </Link>
+                  {' '}
+                  <ShareForm onSubmit={onSend} />
+                  {!!shares.length && (
+                    <>
+                      <hr />
+                      <ul className="unstyled">
+                        {shares.map(({ id, item }, idx) => (
+                          <li key={idx}>
+                            <Item
+                              item={item}
+                              onCopyItem={onCopyItem(id)}
+                              onRemoveItem={onRemoveShare(id)}
+                            />
+                          </li>
+                        ))}
+                      </ul>
+                    </>
+                  )}
+                </>
+              );
         }
       })()}
     </>

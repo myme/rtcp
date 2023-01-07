@@ -2,12 +2,12 @@ import React, { useCallback, useState } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import * as uuid from 'uuid';
 
-import ConnectionManager from './ConnectionManager';
+import ConnectionManager, { usePeerConnection } from './ConnectionManager';
 import Home from './Home';
 import Share, { Direction, Share as IShare } from './Share';
 import New from './New';
-import ControlSocket from './ControlSocket';
-import PeerConnection, { ConnectionState, Item } from './PeerConnection';
+import { Session } from './ControlSocket';
+import { ConnectionState, Item } from './PeerConnection';
 
 import './style.css';
 
@@ -16,10 +16,10 @@ setLevel('log');
 const logger = getLogger('App');
 
 export default function App() {
-  const [controlSocket, setControlSocket] = useState<ControlSocket>();
-  const [peerConnection, setPeerConnection] = useState<PeerConnection>();
   const [connectionState, setConnectionState] = useState<ConnectionState>({ status: 'pending' });
   const [shares, setShares] = useState<IShare[]>([]);
+  const [session, setSession] = useState<Session>();
+  const peerConnection = usePeerConnection();
 
   const addShare = useCallback((direction: Direction, item: Item) => {
     const id = uuid.v4();
@@ -70,16 +70,15 @@ export default function App() {
           onAddShare={addIncomingShare}
           onShareRemoved={onRemoteShareRemoved}
           setConnectionState={setConnectionState}
-          setControlSocket={setControlSocket}
-          setPeerConnection={setPeerConnection}
+          setSession={setSession}
         />
       }>
-        <Route path="/new" element={<New socket={controlSocket} />} />
+        <Route path="/new" element={<New />} />
         <Route path="/:shareId" element={
           <Share
             connectionState={connectionState}
+            session={session}
             shares={shares}
-            socket={controlSocket}
             onCopyItem={onCopyItem}
             onRemoveShare={onRemoveLocalShare}
             onSend={onSend}

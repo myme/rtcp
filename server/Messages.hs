@@ -14,7 +14,7 @@ import qualified Data.Aeson as JSON
 import Data.Char (toLower)
 import qualified Data.List as List
 import Data.Maybe (fromMaybe)
-import GHC.Generics
+import GHC.Generics (Generic)
 
 stripPrefix :: String -> String -> String
 stripPrefix prefix text = fromMaybe text $ List.stripPrefix prefix text
@@ -41,7 +41,7 @@ instance FromJSON RequestWithId where
 data Request
   = GetIceConfig {request_hostname :: String}
   | NewSession
-  | JoinSession {request_sessionId :: String}
+  | JoinSession {request_sessionId :: String, request_sessionPin :: String}
   | LeaveSession
   | Broadcast {request_params :: JSON.Value}
   deriving (Generic, Show)

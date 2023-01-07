@@ -12,6 +12,12 @@ interface Props {
   onIceServersUpdated(iceServers: RTCIceServer[]): void,
   onPeerJoined(): void,
   onBroadcast(message: any): void,
+  setSession(session?: Session): void,
+}
+
+export interface Session {
+  id: string;
+  pin: string;
 }
 
 import { getLogger } from './Logger';
@@ -20,7 +26,7 @@ const logger = getLogger('ControlSocket');
 export default class ControlSocket {
   private requestId = 0;
   private requestMap = new Map<number, RequestHandler>();
-  private sessionId?: string;
+  private session?: Session;
   private socket?: WebSocket;
 
   public constructor(readonly props: Props) {
@@ -150,27 +156,27 @@ export default class ControlSocket {
   public async newSession(): Promise<string> {
     const result = await this.request('newSession');
 
-    if (typeof result !== 'string') {
+    const session = parseSession(result);
+    if (!session) {
       throw new Error(`Invalid "newSession" response: ${result}`);
     }
 
-    this.sessionId = result;
-    return result;
+    this.session = session;
+    this.props.setSession(session);
+    return session.id;
   }
 
-  public async joinSession(sessionId: string) {
-    if (this.sessionId) {
-      logger.info(`ControlSocket::joinSession(): Already joined session: ${this.sessionId}`);
+  public async joinSession(session: Session) {
+    if (this.session) {
+      logger.info(`ControlSocket::joinSession(): Already joined session: ${this.session.id}`);
       return;
     }
 
-    const result = await this.request('joinSession', { sessionId });
+    const { id: sessionId, pin: sessionPin } = session;
+    await this.request('joinSession', { sessionId, sessionPin });
 
-    if (result !== 'OK') {
-      throw new Error(`Invalid "joinSession" response: ${result}`);
-    }
-
-    this.sessionId = sessionId;
+    this.session = session;
+    this.props.setSession(session);
   }
 
   public async leaveSession() {
@@ -180,6 +186,20 @@ export default class ControlSocket {
       throw new Error(`Invalid "leaveSession" response: ${result}`);
     }
 
-    delete this.sessionId;
+    delete this.session;
+    this.props.setSession();
   }
+}
+
+function parseSession(result: any): Session | null {
+  const hasStructure = typeof result === 'object' &&
+    typeof result.id === 'string' &&
+    typeof result.pin === 'string';
+
+  if (!hasStructure) return null;
+
+  return {
+    id: result.id,
+    pin: result.pin,
+  };
 }

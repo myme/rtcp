@@ -1,26 +1,20 @@
-import React, { useEffect }  from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
+import { useControlSocket } from './ConnectionManager';
 
-import ControlSocket from './ControlSocket';
 import Header from './Header';
 
-export interface Props {
-  socket?: ControlSocket,
-}
-
-export default function New(props: Props) {
-  const { socket } = props;
+export default function New() {
+  const controlSocket = useControlSocket();
   const navigate = useNavigate();
 
   useEffect(() => {
-    (async function() {
-      if (!socket) {
-        return;
-      }
-      const sessionId = await socket.newSession();
+    (async function () {
+      if (!controlSocket) return;
+      const sessionId = await controlSocket.newSession();
       navigate(`/${sessionId}`);
     })();
-  }, [socket]);
+  }, [controlSocket]);
 
   return (
     <>
