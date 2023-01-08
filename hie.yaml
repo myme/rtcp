@@ -1,0 +1,4 @@
+cradle:
+  cabal:
+    - path: "./server"
+      component: "exe:rtcp-server"

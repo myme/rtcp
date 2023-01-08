@@ -3,6 +3,7 @@ version: '0.1.0.0'
 dependencies:
   - base == 4.*
   - aeson
+  - containers
   - http-types
   - optparse-applicative
   - random
@@ -19,6 +20,9 @@ executables:
     other-modules:
       - Log
       - Messages
+    default-extensions:
+      - LambdaCase
+      - OverloadedStrings
     ghc-options:
       - -Wall
       - -Werror
