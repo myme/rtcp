@@ -24,11 +24,11 @@ interface Props {
   shares: Share[];
   onCopyItem(id: string): void;
   onRemoveShare(id: string): void;
-  onSend(item: IItem): void;
+  onShare(item: IItem): Share;
 }
 
 export default function Session(props: Props): JSX.Element {
-  const { connectionState, session, shares, onSend } = props;
+  const { connectionState, session, shares, onShare: onSend } = props;
   const { shareId } = useParams();
 
   if (!shareId) {
