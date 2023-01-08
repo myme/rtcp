@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from "react";
-import { Item, ItemType } from "./PeerConnection";
+import { Item, ItemType } from "../PeerConnection";
 
 interface Props {
   onSubmit(item: Item): void,

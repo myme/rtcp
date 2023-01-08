@@ -1,13 +1,14 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-import { Session } from './ControlSocket';
+import { Session } from '../ControlSocket';
+import { Item as IItem } from '../PeerConnection';
+import { Share as IShare } from '../share';
+import { prettifyShareId } from '../utils';
+import { getLogger } from '../Logger';
+
 import ShareForm from './ShareForm';
 import Item from './Item';
-import { Item as IItem } from './PeerConnection';
-import { Share as IShare } from './Session';
-import { prettifyShareId } from './utils';
-import { getLogger } from './Logger';
 import { usePeerConnection } from './ConnectionManager';
 
 const logger = getLogger('Share');

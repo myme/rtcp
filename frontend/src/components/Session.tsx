@@ -1,30 +1,25 @@
 import React from "react";
 import { Link, useParams } from "react-router-dom";
 
+import { Session as ISession } from "../ControlSocket";
+import { ConnectionState, Item as IItem } from "../PeerConnection";
+import { getLogger } from "../Logger";
+import { Share as IShare } from '../share';
+
 import Header from "./Header";
-import { Session as ISession } from "./ControlSocket";
 import Pending from "./Pending";
 import Share from "./Share";
-import { ConnectionState, Item as IItem } from "./PeerConnection";
-import { getLogger } from "./Logger";
 import Error from "./Error";
 
 const logger = getLogger('Session');
 
-export type Direction = "inbound" | "outbound";
-export interface Share {
-  direction: Direction;
-  id: string;
-  item: IItem;
-}
-
 interface Props {
   connectionState: ConnectionState;
   session?: ISession;
-  shares: Share[];
+  shares: IShare[];
   onCopyItem(id: string): void;
   onRemoveShare(id: string): void;
-  onShare(item: IItem): Share;
+  onShare(item: IItem): IShare;
 }
 
 export default function Session(props: Props): JSX.Element {

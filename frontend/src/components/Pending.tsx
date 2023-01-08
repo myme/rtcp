@@ -2,11 +2,12 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { QRCodeSVG } from "qrcode.react";
 
-import { Session } from "./ControlSocket";
+import { Session } from "../ControlSocket";
+import { prettifyShareId } from "../utils";
+import { getLogger } from "../Logger";
+
 import { useControlSocket } from "./ConnectionManager";
 import PinForm from "./PinForm";
-import { prettifyShareId } from "./utils";
-import { getLogger } from "./Logger";
 
 const logger = getLogger('Pending');
 

@@ -1,4 +1,4 @@
-import { Share } from "./Share";
+import { Share } from './share';
 
 import { getLogger } from "./Logger";
 const logger = getLogger('PeerConnection');

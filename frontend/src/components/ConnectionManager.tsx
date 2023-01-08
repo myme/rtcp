@@ -1,9 +1,9 @@
 import React, { useContext, useEffect, useMemo } from 'react';
 import { Outlet } from "react-router";
 
-import ControlSocket, { Session } from './ControlSocket';
-import PeerConnection, { ConnectionState } from './PeerConnection';
-import { Share } from './Session';
+import ControlSocket, { Session } from '../ControlSocket';
+import PeerConnection, { ConnectionState } from '../PeerConnection';
+import { Share } from '../share';
 
 interface Props {
   onAddShare(share: Share): void,

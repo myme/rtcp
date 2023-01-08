@@ -2,16 +2,18 @@ import React, { useState } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import * as uuid from 'uuid';
 
+import { Session as ISession } from '../ControlSocket';
+import { ConnectionState, Item } from '../PeerConnection';
+import { Direction, Share as IShare } from '../share';
+
 import ConnectionManager from './ConnectionManager';
 import Home from './Home';
-import Session, { Direction, Share as IShare } from './Session';
 import New from './New';
-import { Session as ISession } from './ControlSocket';
-import { ConnectionState, Item } from './PeerConnection';
+import Session from './Session';
 
-import './style.css';
+import '../style.css';
 
-import { setLevel } from './Logger';
+import { setLevel } from '../Logger';
 setLevel('log');
 
 export default function App() {
