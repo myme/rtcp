@@ -4,9 +4,9 @@ import * as uuid from 'uuid';
 
 import ConnectionManager, { usePeerConnection } from './ConnectionManager';
 import Home from './Home';
-import Share, { Direction, Share as IShare } from './Share';
+import Session, { Direction, Share as IShare } from './Session';
 import New from './New';
-import { Session } from './ControlSocket';
+import { Session as ISession } from './ControlSocket';
 import { ConnectionState, Item } from './PeerConnection';
 
 import './style.css';
@@ -18,7 +18,7 @@ const logger = getLogger('App');
 export default function App() {
   const [connectionState, setConnectionState] = useState<ConnectionState>({ status: 'pending' });
   const [shares, setShares] = useState<IShare[]>([]);
-  const [session, setSession] = useState<Session>();
+  const [session, setSession] = useState<ISession>();
   const peerConnection = usePeerConnection();
 
   const addShare = (direction: Direction, item: Item) => {
@@ -73,7 +73,7 @@ export default function App() {
       }>
         <Route path="/new" element={<New />} />
         <Route path="/:shareId" element={
-          <Share
+          <Session
             connectionState={connectionState}
             session={session}
             shares={shares}

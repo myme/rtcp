@@ -3,7 +3,7 @@ import { Outlet } from "react-router";
 
 import ControlSocket, { Session } from './ControlSocket';
 import PeerConnection, { ConnectionState } from './PeerConnection';
-import { Share } from './Share';
+import { Share } from './Session';
 
 interface Props {
   onAddShare(share: Share): void,
