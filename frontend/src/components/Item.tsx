@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react';
 
+import { Item as IItem } from '../PeerConnection';
 import Icon from './Icon';
-import { Item as IItem } from './PeerConnection';
 
 interface Props {
   item: IItem,
