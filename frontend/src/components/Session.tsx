@@ -1,8 +1,7 @@
 import React from "react";
 import { Link, useParams } from "react-router-dom";
 
-import { Session as ISession } from "../ControlSocket";
-import { ConnectionState, Item as IItem } from "../PeerConnection";
+import { Item as IItem } from "../PeerConnection";
 import { getLogger } from "../Logger";
 import { Share as IShare } from '../share';
 
@@ -10,12 +9,11 @@ import Header from "./Header";
 import Pending from "./Pending";
 import Share from "./Share";
 import Error from "./Error";
+import { useConnectionState, useSession } from "./ConnectionManager";
 
 const logger = getLogger('Session');
 
 interface Props {
-  connectionState: ConnectionState;
-  session?: ISession;
   shares: IShare[];
   onCopyItem(id: string): void;
   onRemoveShare(id: string): void;
@@ -23,8 +21,10 @@ interface Props {
 }
 
 export default function Session(props: Props): JSX.Element {
-  const { connectionState, session, shares, onShare: onSend } = props;
+  const { shares, onShare: onSend } = props;
   const { shareId } = useParams();
+  const connectionState = useConnectionState();
+  const session = useSession();
 
   if (!shareId) {
     logger.error("Invalid app state, no share id");

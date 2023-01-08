@@ -1,75 +1,51 @@
-import React, { useState } from 'react';
-import { Route, Routes } from 'react-router-dom';
-import * as uuid from 'uuid';
+import React from "react";
+import { Route, Routes } from "react-router-dom";
 
-import { Session as ISession } from '../ControlSocket';
-import { ConnectionState, Item } from '../PeerConnection';
-import { Direction, Share as IShare } from '../share';
+import { useShare } from "../share";
 
-import ConnectionManager from './ConnectionManager';
-import Home from './Home';
-import New from './New';
-import Session from './Session';
+import ConnectionManager from "./ConnectionManager";
+import Home from "./Home";
+import New from "./New";
+import Session from "./Session";
 
-import '../style.css';
+import "../style.css";
 
-import { setLevel } from '../Logger';
-setLevel('log');
+import { setLevel } from "../Logger";
+setLevel("log");
 
 export default function App() {
-  const [connectionState, setConnectionState] = useState<ConnectionState>({ status: 'pending' });
-  const [shares, setShares] = useState<IShare[]>([]);
-  const [session, setSession] = useState<ISession>();
-
-  const addShare = (direction: Direction, item: Item) => {
-    const id = uuid.v4();
-    const share = { id, direction, item };
-    setShares(shares => shares.concat(share));
-    return share;
-  };
-
-  const addIncomingShare = (share: IShare) => {
-    setShares(shares => shares.concat(share));
-  };
-
-  const onCopyItem = (id: string) => {
-    const share = shares.find(share => share.id === id);
-    if (!share) return;
-    navigator.clipboard.writeText(share.item.value);
-  };
-
-  const onRemoteShareRemoved = (id: string) => {
-    setShares(shares => shares.filter(share => share.id !== id));
-  };
-
-  const onRemoveLocalShare = (id: string) => {
-    setShares(shares => shares.filter(share => share.id !== id));
-  };
-
-  const onShare = (item: Item) => addShare('outbound', item);
+  const {
+    addIncomingShare,
+    onCopyItem,
+    onRemoteShareRemoved,
+    onRemoveLocalShare,
+    onShare,
+    shares,
+  } = useShare();
 
   return (
     <Routes>
       <Route index element={<Home />} />
-      <Route element={
-        <ConnectionManager
-          onAddShare={addIncomingShare}
-          onShareRemoved={onRemoteShareRemoved}
-          setConnectionState={setConnectionState}
-          setSession={setSession}
-        />
-      }>
-        <Route path="/new" element={<New />} />
-        <Route path="/:shareId" element={
-          <Session
-            connectionState={connectionState}
-            session={session}
-            shares={shares}
-            onCopyItem={onCopyItem}
-            onRemoveShare={onRemoveLocalShare}
-            onShare={onShare}
+      <Route
+        element={
+          <ConnectionManager
+            onAddShare={addIncomingShare}
+            onShareRemoved={onRemoteShareRemoved}
           />
-        } />
+        }
+      >
+        <Route path="/new" element={<New />} />
+        <Route
+          path="/:shareId"
+          element={
+            <Session
+              shares={shares}
+              onCopyItem={onCopyItem}
+              onRemoveShare={onRemoveLocalShare}
+              onShare={onShare}
+            />
+          }
+        />
       </Route>
     </Routes>
   );

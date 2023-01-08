@@ -1,23 +1,30 @@
-import React, { useContext, useEffect, useMemo } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from "react";
 import { Outlet } from "react-router";
 
-import ControlSocket, { Session } from '../ControlSocket';
-import PeerConnection, { ConnectionState } from '../PeerConnection';
-import { Share } from '../share';
+import ControlSocket, { Session } from "../ControlSocket";
+import PeerConnection, { ConnectionState } from "../PeerConnection";
+import { Share } from "../share";
 
 interface Props {
-  onAddShare(share: Share): void,
-  onShareRemoved(id: string): void,
-  setConnectionState(connectionState: ConnectionState): void,
-  setSession(session?: Session): void;
+  onAddShare(share: Share): void;
+  onShareRemoved(id: string): void;
 }
 
 interface Context {
-  controlSocket?: ControlSocket,
-  peerConnection?: PeerConnection,
+  connectionState: ConnectionState;
+  controlSocket?: ControlSocket;
+  peerConnection?: PeerConnection;
+  session?: Session;
 }
 
-const ConnectionContext = React.createContext<Context>({});
+const ConnectionContext = React.createContext<Context>({
+  connectionState: { status: "pending" },
+});
+
+export function useConnectionState() {
+  const { connectionState } = useContext(ConnectionContext);
+  return connectionState;
+}
 
 export function useControlSocket() {
   const { controlSocket } = useContext(ConnectionContext);
@@ -29,49 +36,76 @@ export function usePeerConnection() {
   return peerConnection;
 }
 
+export function useSession() {
+  const { session } = useContext(ConnectionContext);
+  return session;
+}
+
 export default function ConnectionManager(props: Props) {
-  const { onAddShare, onShareRemoved, setConnectionState, setSession } = props;
+  const { onAddShare, onShareRemoved } = props;
+  const [connectionState, setConnectionState] = useState<ConnectionState>({
+    status: "pending",
+  });
+  const [session, setSession] = useState<Session>();
 
-  const controlSocket = useMemo(() => new ControlSocket({
-    onError(error: string) {
-      setConnectionState({ status: 'error', error });
-    },
-    onIceServersUpdated(iceServers) {
-      peerConnection.setIceServers(iceServers);
-    },
-    onPeerJoined() {
-      peerConnection.sendOffer();
-    },
-    onBroadcast(message) {
-      peerConnection.handleControlMessage(message);
-    },
-    setSession,
-  }), []);
+  const controlSocket = useMemo(
+    () =>
+      new ControlSocket({
+        onError(error: string) {
+          setConnectionState({ status: "error", error });
+        },
+        onIceServersUpdated(iceServers) {
+          peerConnection.setIceServers(iceServers);
+        },
+        onPeerJoined() {
+          peerConnection.sendOffer();
+        },
+        onBroadcast(message) {
+          peerConnection.handleControlMessage(message);
+        },
+        setSession,
+      }),
+    []
+  );
 
-  const peerConnection = useMemo(() => new PeerConnection({
-    onConnectionStateChange: setConnectionState,
-    onIceCandidate(candidate) {
-      controlSocket.broadcast('candidate', { candidate });
-    },
-    onSessionDescription(type, description) {
-      controlSocket.broadcast(type, { description });
-    },
-    onShare: onAddShare,
-    onRemoveShare: onShareRemoved,
-  }), []);
+  const peerConnection = useMemo(
+    () =>
+      new PeerConnection({
+        onConnectionStateChange: setConnectionState,
+        onIceCandidate(candidate) {
+          controlSocket.broadcast("candidate", { candidate });
+        },
+        onSessionDescription(type, description) {
+          controlSocket.broadcast(type, { description });
+        },
+        onShare: onAddShare,
+        onRemoveShare: onShareRemoved,
+      }),
+    []
+  );
 
   // Cleanup
-  useEffect(() => () => {
-    // Next tick to let child components send leave message
-    setTimeout(() => {
-      controlSocket.close();
-      peerConnection.close();
-      setConnectionState({ status: 'pending' });
-    }, 0);
-  }, []);
+  useEffect(
+    () => () => {
+      // Next tick to let child components send leave message
+      setTimeout(() => {
+        controlSocket.close();
+        peerConnection.close();
+        setConnectionState({ status: "pending" });
+      }, 0);
+    },
+    []
+  );
+
+  const context = {
+    connectionState,
+    controlSocket,
+    peerConnection,
+    session,
+  };
 
   return (
-    <ConnectionContext.Provider value={{ controlSocket, peerConnection}}>
+    <ConnectionContext.Provider value={context}>
       <Outlet />
     </ConnectionContext.Provider>
   );
