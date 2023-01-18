@@ -1,5 +1,5 @@
 const SIGNALING_SERVER_HOST = import.meta.env.VITE_SIGNALING_SERVER || location.host;
-const SIGNALING_SERVER_PROTO = import.meta.env.DEV || location.hostname === 'localhost' ? 'ws:' : 'wss:';
+const SIGNALING_SERVER_PROTO = import.meta.env.DEV || location.protocol === 'http:' ? 'ws:' : 'wss:';
 const SIGNALING_SERVER_WS_URL = `${SIGNALING_SERVER_PROTO}//${SIGNALING_SERVER_HOST}`;
 
 interface RequestHandler {
