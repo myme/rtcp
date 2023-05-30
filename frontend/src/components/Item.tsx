@@ -49,7 +49,8 @@ function Output(props: {
   }
 
   if (type === 'link') {
-    return <a href={value}>{value}</a>;
+    const href = value.match(/https?:\/\//) ? value : `https://${value}`;
+    return <a href={href} target="_blank">{value}</a>;
   }
 
   return <span>{value}</span>;
