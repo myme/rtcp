@@ -13,7 +13,7 @@ export default function Item(props: Props) {
   const [showHidden, setShowHidden] = useState(false);
   const { item: { type, value }, onCopyItem, onRemoveItem } = props;
 
-  const output = type === 'hidden' && !showHidden ? value.replace(/./g, '*') : value;
+  const output = type === 'hidden' && !showHidden ? '***' : value;
 
   const toggleShowHidden = useCallback(() => {
     setShowHidden(v => !v);
