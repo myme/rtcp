@@ -1,5 +1,6 @@
-import React, { useCallback, useState } from "react";
+import React, { useState } from "react";
 import { Item, ItemType } from "../PeerConnection";
+import Icon from "./Icon";
 
 interface Props {
   onSubmit(item: Item): void,
@@ -12,30 +13,44 @@ function capitalize(input: string) {
 export default function Form(props: Props): JSX.Element {
   const { onSubmit } = props;
   const [input, setInput] = useState('');
+  const [autoType, setAutoType] = useState(true);
+  const [hidden, setHidden] = useState(false);
   const [type, setType] = useState<ItemType>('text');
 
-  const submit: React.FormEventHandler = useCallback((event) => {
+  const submit: React.FormEventHandler = (event) => {
     event.preventDefault();
-    onSubmit({ type, value: input });
+    onSubmit({ type, value: input, hidden });
     setInput('');
+    setAutoType(true);
+    setHidden(false);
     setType('text');
-  }, [input, type, setInput, setType, onSubmit]);
+  };
 
-  const inputChange: React.ChangeEventHandler<HTMLInputElement> = useCallback((event) => {
-    setInput(event.target.value);
-  }, [setInput]);
+  const inputChange: React.ChangeEventHandler<HTMLInputElement> = (event) => {
+    const { value } = event.target;
+    setInput(value);
+    if (autoType) {
+      if (value.match(/^https?:\/\//) || value.match(/\w+\.\w{2,}/)) {
+        setType('link');
+      } else {
+        setType('text');
+      }
+    }
+  };
 
-  const typeChange: React.ChangeEventHandler<HTMLSelectElement> = useCallback((event) => {
+  const typeChange: React.ChangeEventHandler<HTMLSelectElement> = (event) => {
+    setAutoType(false);
     const value = event.target.value.toLowerCase();
     switch (value) {
+      case 'link':
       case 'text':
-      case 'hidden':
-      // case 'file':
+        // case 'file':
         setType(value);
     }
-  }, [setType]);
+  };
 
-  const types: ItemType[] = ['text', 'hidden', /* 'file' */];
+  const types: ItemType[] = ['link', 'text', /* 'file' */];
+  const secretIcon = hidden ? "eye-slash" : "eye";
 
   return (
     <form id="client" className="inline" onSubmit={submit}>
@@ -45,8 +60,15 @@ export default function Form(props: Props): JSX.Element {
             <option key={type} value={type}>{capitalize(type)}</option>
           ))}
         </select>
+        <button
+          type="button"
+          onClick={() => setHidden(h => !h)}
+          title="Toggle hidden input"
+        >
+          <Icon icon={secretIcon} />
+        </button>
         <input
-          type={type === 'hidden' ? 'password' : type}
+          type={hidden ? 'password' : type}
           placeholder="Input"
           value={input}
           onChange={inputChange}

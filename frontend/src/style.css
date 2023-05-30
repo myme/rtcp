@@ -55,6 +55,11 @@ button[disabled] {
   cursor: grabbing;
 }
 
+button svg {
+  border: none !important;
+  margin: 0;
+}
+
 form.inline {
   display: inline-block;
 }

@@ -9,11 +9,12 @@ export interface ConnectionState {
   error?: string;
 }
 
-export type ItemType = 'text' | 'hidden'; // | 'file';
+export type ItemType = 'link' | 'text';  // | 'file';
 
 export interface Item {
-  type: ItemType,
-  value: string,
+  type: ItemType;
+  value: string;
+  hidden: boolean;
 }
 
 type MessageType = 'share' | 'removeShare';

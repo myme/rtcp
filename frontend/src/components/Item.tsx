@@ -11,19 +11,17 @@ interface Props {
 
 export default function Item(props: Props) {
   const [showHidden, setShowHidden] = useState(false);
-  const { item: { type, value }, onCopyItem, onRemoveItem } = props;
-
-  const output = type === 'hidden' && !showHidden ? '***' : value;
+  const { item, onCopyItem, onRemoveItem } = props;
 
   const toggleShowHidden = useCallback(() => {
     setShowHidden(v => !v);
   }, [setShowHidden]);
 
-  const hideHiddenBtnClass = type !== 'hidden' ? 'hidden' : '';
+  const hideHiddenBtnClass = !item.hidden ? 'hidden' : '';
 
   return (
     <>
-      <span>{output}</span>
+      <Output item={item} showHidden={showHidden} />
       <span>
         <button className={`unstyled ${hideHiddenBtnClass}`} onClick={toggleShowHidden} title="Show item">
           {showHidden ? <Icon icon="eye-slash" /> : <Icon icon="eye" />}
@@ -37,4 +35,22 @@ export default function Item(props: Props) {
       </span>
     </>
   );
+}
+
+function Output(props: {
+  item: IItem;
+  showHidden: boolean;
+}) {
+  const { item, showHidden } = props;
+  const { value, type, hidden } = item;
+
+  if (hidden && !showHidden) {
+    return <span>***</span>;
+  }
+
+  if (type === 'link') {
+    return <a href={value}>{value}</a>;
+  }
+
+  return <span>{value}</span>;
 }
