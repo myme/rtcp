@@ -33,6 +33,10 @@ export function useShare() {
       setShares(shares => shares.filter(share => share.id !== id));
     },
 
+    onResetLocalShares() {
+      setShares([]);
+    },
+
     onShare(item: Item) {
       const id = uuid.v4();
       const share: Share = { id, direction: 'outbound', item };

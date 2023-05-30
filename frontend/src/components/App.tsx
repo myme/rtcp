@@ -19,6 +19,7 @@ export default function App() {
     onCopyItem,
     onRemoteShareRemoved,
     onRemoveLocalShare,
+    onResetLocalShares,
     onShare,
     shares,
   } = useShare();
@@ -31,6 +32,7 @@ export default function App() {
           <ConnectionManager
             onAddShare={addIncomingShare}
             onShareRemoved={onRemoteShareRemoved}
+            onReset={onResetLocalShares}
           />
         }
       >

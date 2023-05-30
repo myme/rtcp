@@ -8,6 +8,7 @@ import { Share } from "../share";
 interface Props {
   onAddShare(share: Share): void;
   onShareRemoved(id: string): void;
+  onReset(): void;
 }
 
 interface Context {
@@ -42,7 +43,7 @@ export function useSession() {
 }
 
 export default function ConnectionManager(props: Props) {
-  const { onAddShare, onShareRemoved } = props;
+  const { onAddShare, onShareRemoved, onReset } = props;
   const [connectionState, setConnectionState] = useState<ConnectionState>({
     status: "pending",
   });
@@ -92,6 +93,7 @@ export default function ConnectionManager(props: Props) {
         controlSocket.close();
         peerConnection.close();
         setConnectionState({ status: "pending" });
+        onReset();
       }, 0);
     },
     []
