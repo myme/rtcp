@@ -37,15 +37,15 @@ export default function Pending({ session, shareId }: PendingProps) {
   }
 
   return (
-    <h1>
-      <p>
+    <>
+      <h1>
         Share ID:
         <Link to={`/${session.id}`}>{prettifyShareId(session.id)}</Link>
-      </p>
-      <p>{`PIN: ${session.pin}`}</p>
+      </h1>
+      <h1>{`PIN: ${session.pin}`}</h1>
       <p>
         <QRCodeSVG value={`${location}`} />
       </p>
-    </h1>
+    </>
   );
 }
