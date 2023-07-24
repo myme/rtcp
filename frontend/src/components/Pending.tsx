@@ -1,5 +1,5 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { QRCodeSVG } from "qrcode.react";
 
 import { Session } from "../ControlSocket";
@@ -18,6 +18,7 @@ interface PendingProps {
 
 export default function Pending({ session, shareId }: PendingProps) {
   const controlSocket = useControlSocket();
+  const navigate = useNavigate();
 
   const onConnectWrapper = (sharePin: string) => {
     if (!controlSocket) {
@@ -26,6 +27,17 @@ export default function Pending({ session, shareId }: PendingProps) {
     }
     controlSocket.joinSession({ id: shareId, pin: sharePin });
   };
+
+  const autoConnect = useAutoConnect({
+    onPinFound(pin) {
+      onConnectWrapper(pin);
+      navigate(`/${shareId}`);
+    },
+  });
+
+  if (autoConnect) {
+    return null;
+  }
 
   if (!session) {
     return (
@@ -36,16 +48,35 @@ export default function Pending({ session, shareId }: PendingProps) {
     );
   }
 
+  const sessionWithPin = `/${session.id}?pin=${session.pin}`;
+  const qrCodeLink = `${window.location.origin}${sessionWithPin}`;
+
   return (
     <>
       <h1>
         Share ID:
-        <Link to={`/${session.id}`}>{prettifyShareId(session.id)}</Link>
+        <Link to={sessionWithPin}>{prettifyShareId(session.id)}</Link>
       </h1>
       <h1>{`PIN: ${session.pin}`}</h1>
       <p>
-        <QRCodeSVG value={`${location}`} />
+        <QRCodeSVG value={qrCodeLink} />
       </p>
     </>
   );
+}
+
+function useAutoConnect({ onPinFound }: { onPinFound(pin: string): void }) {
+  const [autoConnect, setAutoConnect] = useState(false);
+
+  // Move /shareId?pin=1234 query param into state and redirect to /shareId
+  useEffect(() => {
+    const pin = new URLSearchParams(window.location.search).get("pin");
+    if (!pin) {
+      return;
+    }
+    setAutoConnect(true);
+    onPinFound(pin);
+  }, []);
+
+  return autoConnect;
 }
