@@ -23,10 +23,13 @@ requestJSONOptions :: Options
 requestJSONOptions =
   JSON.defaultOptions
     { allNullaryToStringTag = False,
-      constructorTagModifier = \(c : cs) -> toLower c : cs,
+      constructorTagModifier = downcase,
       fieldLabelModifier = stripPrefix "request_",
       sumEncoding = JSON.TaggedObject "method" "method"
     }
+  where
+    downcase (c : cs) = toLower c : cs
+    downcase [] = []
 
 data RequestWithId = RequestWithId
   { request_id :: Int,
