@@ -4,6 +4,7 @@ import { Outlet } from "react-router";
 import ControlSocket, { Session } from "../ControlSocket";
 import PeerConnection, { ConnectionState } from "../PeerConnection";
 import { Share } from "../share";
+import Header from './Header';
 
 interface Props {
   onAddShare(share: Share): void;
@@ -108,6 +109,7 @@ export default function ConnectionManager(props: Props) {
 
   return (
     <ConnectionContext.Provider value={context}>
+      <Header small={connectionState.status === "connected"} />
       <Outlet />
     </ConnectionContext.Provider>
   );

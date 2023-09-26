@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
 
 import { useControlSocket } from './ConnectionManager';
-import Header from './Header';
 
 export default function New() {
   const controlSocket = useControlSocket();
@@ -17,11 +16,8 @@ export default function New() {
   }, [controlSocket]);
 
   return (
-    <>
-      <Header />
-      <p>
-        {'Loading...'}
-      </p>
-    </>
+    <p>
+      {'Loading…'}
+    </p>
   );
 }
