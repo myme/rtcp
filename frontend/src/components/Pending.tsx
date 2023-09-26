@@ -59,7 +59,7 @@ export default function Pending({ session, shareId }: PendingProps) {
       </h1>
       <h1>{`PIN: ${session.pin}`}</h1>
       <p>
-        <QRCodeSVG value={qrCodeLink} />
+        <QRCodeSVG className="qr-code" value={qrCodeLink} />
       </p>
     </>
   );

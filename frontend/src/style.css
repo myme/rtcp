@@ -17,7 +17,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
   font-size: 20px;
   color: #2c3e50;
-  margin-top: 60px;
+  margin-top: 3em;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -27,6 +27,10 @@ body {
 main {
   text-align: center;
   min-width: 350px;
+}
+
+main > * {
+  margin-top: 0.7em;
 }
 
 h1 img.app-logo, h2 img.app-logo {
@@ -94,6 +98,10 @@ hr {
 }
 
 p {
+  margin: 1em;
+}
+
+svg.qr-code {
   margin: 1em;
 }
 
