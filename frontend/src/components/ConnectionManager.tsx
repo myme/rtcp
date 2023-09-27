@@ -2,9 +2,12 @@ import React, { useContext, useEffect, useMemo, useState } from "react";
 import { Outlet } from "react-router";
 
 import ControlSocket, { Session } from "../ControlSocket";
+import { getLogger } from "../Logger";
 import PeerConnection, { ConnectionState } from "../PeerConnection";
 import { Share } from "../share";
 import Header from './Header';
+
+const logger = getLogger("ConnectionManager");
 
 interface Props {
   onAddShare(share: Share): void;
@@ -71,7 +74,8 @@ export default function ConnectionManager(props: Props) {
         onIceServersUpdated(iceServers) {
           peerConnection.setIceServers(iceServers);
         },
-        onPeerJoined() {
+        onPeerJoined(clientId) {
+          logger.info(`Peer joined: ${clientId}`);
           peerConnection.sendOffer();
         },
         onBroadcast(message) {

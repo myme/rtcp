@@ -5,9 +5,10 @@ module Main (main) where
 import Control.Applicative ((<**>))
 import Control.Exception (catch)
 import Control.Monad (forM_, void, (>=>))
-import Data.Aeson (FromJSON, ToJSON)
+import Data.Aeson (FromJSON, ToJSON, (.=))
 import qualified Data.Aeson as JSON
 import qualified Data.ByteString.Char8 as BS8
+import Data.Functor ((<&>))
 import qualified Data.IORef as Ref
 import qualified Data.List as List
 import Data.Map.Strict (Map)
@@ -160,10 +161,12 @@ joinSession conn session state = do
       Log.info $
         "joinSession: sessionId=" <> session_id session <> ", conn=" <> show conn
       let isOther c = not (sameConnection conn c) && sameSession (session_id session) c
-          others = map fst . filter isOther $ connections state'
+          others = filter isOther $ connections state'
       forM_ others $ \other -> do
         Log.info $ "joinSession: notifyJoin conn=" <> show conn
-        WS.sendTextData (con_ws other) (JSON.encode $ Msg.Notify "peerJoined" Nothing)
+        let params =
+              fst (snd other) <&> \clientId -> JSON.object ["clientId" .= clientId]
+        WS.sendTextData (con_ws $ fst other) (JSON.encode $ Msg.Notify "peerJoined" params)
       pure $ Right ()
 
 leaveSession :: Connection -> StateRef -> IO (Either String ())

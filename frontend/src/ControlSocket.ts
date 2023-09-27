@@ -11,7 +11,7 @@ interface Props {
   onError(error: string): void,
   onTokenData(tokenData: TokenData): void,
   onIceServersUpdated(iceServers: RTCIceServer[]): void,
-  onPeerJoined(): void,
+  onPeerJoined(clientID: string): void,
   onBroadcast(message: any): void,
   setSession(session?: Session): void,
 }
@@ -103,7 +103,8 @@ export default class ControlSocket {
       switch (message.method) {
         case 'peerJoined':
           logger.info('ControlSocket::handleMessage(): Peer joined');
-          this.props.onPeerJoined();
+          const { clientId } = message.params;
+          this.props.onPeerJoined(clientId);
           return;
         case 'broadcast':
           logger.info('ControlSocket::handleMessage(): Broadcast');
