@@ -4,6 +4,7 @@ import { Item as IItem } from '../PeerConnection';
 import Icon from './Icon';
 
 interface Props {
+  clientId: string,
   item: IItem,
   onCopyItem(): void,
   onRemoveItem(): void,
@@ -11,7 +12,7 @@ interface Props {
 
 export default function Item(props: Props) {
   const [showHidden, setShowHidden] = useState(false);
-  const { item, onCopyItem, onRemoveItem } = props;
+  const { clientId, item, onCopyItem, onRemoveItem } = props;
 
   const toggleShowHidden = useCallback(() => {
     setShowHidden(v => !v);
@@ -22,6 +23,7 @@ export default function Item(props: Props) {
   return (
     <>
       <Output item={item} showHidden={showHidden} />
+      <small title={`From client ID: ${clientId}`}>{`${clientId.substring(0, 9)}…`}</small>
       <span>
         <button className={`unstyled ${hideHiddenBtnClass}`} onClick={toggleShowHidden} title="Show item">
           {showHidden ? <Icon icon="eye-slash" /> : <Icon icon="eye" />}

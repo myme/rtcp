@@ -16,7 +16,7 @@ interface Props {
   shares: IShare[];
   onCopyItem(id: string): void;
   onRemoveShare(id: string): void;
-  onShare(item: IItem): IShare;
+  onShare(clientId: string, item: IItem): IShare;
 }
 
 export default function Session(props: Props): JSX.Element {

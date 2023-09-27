@@ -29,6 +29,7 @@ export interface Props {
 }
 
 export default class PeerConnection {
+  private clientId?: string;
   private channel?: RTCDataChannel;
   private pc?: RTCPeerConnection;
   private rtcConfig: RTCConfiguration = {};
@@ -53,6 +54,14 @@ export default class PeerConnection {
       this.pc.close();
       delete this.pc;
     }
+  }
+
+  public getClientId() {
+    return this.clientId;
+  }
+
+  public setClientId(clientId: string) {
+    this.clientId = clientId;
   }
 
   public setIceServers(iceServers: RTCIceServer[]) {
@@ -115,14 +124,14 @@ export default class PeerConnection {
         throw new Error(`Invalid message: ${message}`);
       }
 
-      const { type, ...payload } = data;
+      const { type, clientId, ...payload } = data;
 
       switch (type as MessageType) {
         case 'share':
           if (typeof payload.share !== 'object') {
             throw new Error(`Invalid share object: ${payload.share}`);
           }
-          this.props.onShare({ ...payload.share, 'direction': 'inbound' });
+          this.props.onShare({ ...payload.share, 'direction': 'inbound', clientId });
           break;
         case 'removeShare':
           if (typeof payload.id !== 'string') {
@@ -188,7 +197,7 @@ export default class PeerConnection {
       logger.error('PeerConnection::send(): No data channel');
       return;
     }
-    const message = JSON.stringify({ type, ...payload });
+    const message = JSON.stringify({ type, clientId: this.getClientId(), ...payload });
     logger.debug(`PeerConnection::send(): ${message}`);
     this.channel.send(message);
   }

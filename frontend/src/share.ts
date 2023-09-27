@@ -6,6 +6,7 @@ import { Item } from "./PeerConnection";
 export type Direction = "inbound" | "outbound";
 
 export interface Share {
+  clientId: string;
   direction: Direction;
   id: string;
   item: Item;
@@ -37,9 +38,9 @@ export function useShare() {
       setShares([]);
     },
 
-    onShare(item: Item) {
+    onShare(clientId: string, item: Item) {
       const id = uuid.v4();
-      const share: Share = { id, direction: 'outbound', item };
+      const share: Share = { clientId, id, direction: 'outbound', item };
       setShares(shares => shares.concat(share));
       return share;
     },

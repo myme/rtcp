@@ -5,14 +5,17 @@ module Main (main) where
 import Control.Applicative ((<**>))
 import Control.Exception (catch)
 import Control.Monad (forM_, void, (>=>))
-import Data.Aeson (ToJSON)
+import Data.Aeson (FromJSON, ToJSON)
 import qualified Data.Aeson as JSON
+import qualified Data.ByteString.Char8 as BS8
 import qualified Data.IORef as Ref
 import qualified Data.List as List
 import Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
 import Data.Text (Text)
 import qualified Data.Text as T
+import qualified Data.UUID as UUID
+import qualified Data.UUID.V4 as UUID
 import GHC.Generics (Generic)
 import qualified Log
 import qualified Messages as Msg
@@ -25,6 +28,7 @@ import qualified Network.Wai.Middleware.Static as Static
 import qualified Network.WebSockets as WS
 import qualified Options.Applicative as Opts
 import qualified System.Random as R
+import qualified Web.ClientSession as Session
 import Prelude hiding (id)
 
 type ConnectionId = Int
@@ -80,7 +84,9 @@ instance ToJSON Session where
 
 type Sessions = Map SessionId Session
 
-type Connections = [(Connection, Maybe SessionId)]
+type ClientId = UUID.UUID
+
+type Connections = [(Connection, (Maybe ClientId, Maybe SessionId))]
 
 data State = State
   { connections :: Connections,
@@ -96,8 +102,8 @@ hasConnection conn = any ((== con_id conn) . con_id . fst) . connections
 sameConnection :: Connection -> (Connection, a) -> Bool
 sameConnection conn = (== con_id conn) . con_id . fst
 
-sameSession :: SessionId -> (a, Maybe SessionId) -> Bool
-sameSession sessionId = (== Just sessionId) . snd
+sameSession :: SessionId -> (a, (Maybe ClientId, Maybe SessionId)) -> Bool
+sameSession sessionId = (== Just sessionId) . snd . snd
 
 leftPad :: Int -> Char -> String -> String
 leftPad n c s = replicate (n - length s) c <> s
@@ -138,8 +144,8 @@ addConnectionToSession conn (Session id' pin) state@(State cs ss)
   | otherwise = Right $ State (map setConnSessionId cs) ss
   where
     hasValidPin = (== Just pin) $ session_pin <$> Map.lookup id' ss
-    setConnSessionId c@(other, _)
-      | con_id other == con_id conn = (other, Just id')
+    setConnSessionId c@(other, (clientId, _))
+      | con_id other == con_id conn = (other, (clientId, Just id'))
       | otherwise = c
 
 joinSession :: Connection -> Session -> StateRef -> IO (Either String ())
@@ -171,21 +177,78 @@ leaveSession conn stateRef = do
       Log.info $ "leaveSession: conn=" <> show conn
       pure $ Right ()
 
+data TokenData = TokenData
+  { token_user :: Maybe String,
+    token_clientId :: UUID.UUID,
+    token_logins :: Int
+  }
+  deriving (Generic, Show)
+
+instance FromJSON TokenData
+
+instance ToJSON TokenData
+
+authenticate :: String -> Connection -> StateRef -> IO (Either String (TokenData, String))
+authenticate token conn stateRef = do
+  key <- Session.getDefaultKey
+
+  -- Attempt to fetch user data from the token
+  maybeTokenData <- case Session.decrypt key (BS8.pack token) of
+    Nothing -> do
+      Log.info "Invalid token"
+      pure Nothing
+    Just text -> case JSON.eitherDecodeStrict text of
+      Left err -> do
+        Log.err err
+        pure Nothing
+      Right (TokenData username clientId logins) -> do
+        pure . Just $ TokenData username clientId (logins + 1)
+
+  -- If the token was invalid, start with fresh data
+  tokenData <- case maybeTokenData of
+    Just tokenData -> pure tokenData
+    Nothing -> do
+      clientId <- UUID.nextRandom
+      pure $ TokenData Nothing clientId 1
+
+  -- Assign the client ID to the connection
+  Ref.atomicModifyIORef' stateRef (setConnectionClientId conn (token_clientId tokenData))
+
+  -- Serialize the token data and encrypt it
+  encrypted <- Session.encryptIO key (BS8.toStrict $ JSON.encode tokenData)
+  pure . Right $ (tokenData, BS8.unpack encrypted)
+
+setConnectionClientId :: Connection -> UUID.UUID -> State -> (State, ())
+setConnectionClientId conn clientId (State cs ss) =
+  (State (map setClientId cs) ss, ())
+  where
+    setClientId c@(other, (_, sessionId))
+      | con_id other == con_id conn = (other, (Just clientId, sessionId))
+      | otherwise = c
+
+login :: String -> IO (Either String (TokenData, String))
+login username = do
+  key <- Session.getDefaultKey
+  clientId <- UUID.nextRandom
+  let tokenData = TokenData (Just username) clientId 1
+  encrypted <- Session.encryptIO key (BS8.toStrict $ JSON.encode tokenData)
+  pure . Right $ (tokenData, BS8.unpack encrypted)
+
 removeConnection :: Connection -> State -> Either String State
 removeConnection conn state@(State cs ss)
   | not $ hasConnection conn state = Left $ "No such connection: " <> show conn
   | otherwise = case List.find (sameConnection conn) cs of
-      Just (_, Just sessionId) ->
+      Just (_, (_, Just sessionId)) ->
         let newConnections = map unsetSessionId cs
             newSessions =
-              if any ((== Just sessionId) . snd) cs
+              if any ((== Just sessionId) . snd . snd) cs
                 then ss
                 else Map.delete sessionId ss
          in Right $ State newConnections newSessions
       _ -> Left $ "Connection is not attached to a session: " <> show conn
   where
     unsetSessionId x@(c, _)
-      | con_id c == con_id conn = (c, Nothing)
+      | con_id c == con_id conn = (c, (Nothing, Nothing))
       | otherwise = x
 
 broadcast :: JSON.Value -> Connection -> StateRef -> IO (Either String String)
@@ -209,8 +272,8 @@ broadcast payload conn state = do
   where
     findOthers state' = case List.find (sameConnection conn) state' of
       Nothing -> Left $ "No such connection: conn=" <> show conn
-      Just (_, Nothing) -> Left $ "Connection is not in a session: conn=" <> show conn
-      Just (_, Just sessionId) ->
+      Just (_, (_, Nothing)) -> Left $ "Connection is not in a session: conn=" <> show conn
+      Just (_, (_, Just sessionId)) ->
         let others = filter (not . sameConnection conn) $ filter (sameSession sessionId) state'
          in Right (sessionId, others)
 
@@ -220,7 +283,7 @@ wsApp getConnId stateRef req = do
   Ref.atomicModifyIORef' stateRef $ \state -> (addConnection conn state, ())
   go conn
   where
-    addConnection conn state@(State cs _) = state {connections = (conn, Nothing) : cs}
+    addConnection conn state@(State cs _) = state {connections = (conn, (Nothing, Nothing)) : cs}
     toJSON :: (Functor f, ToJSON a) => f a -> f JSON.Value
     toJSON = fmap JSON.toJSON
     go conn = do
@@ -234,10 +297,12 @@ wsApp getConnId stateRef req = do
               pure $ Msg.Failure Nothing err
             Right (Msg.RequestWithId id request) -> do
               result <- case request of
+                Msg.Authenticate token -> toJSON <$> authenticate token conn stateRef
                 Msg.GetIceConfig hostname -> pure . Right . JSON.toJSON $ getIceConfig hostname
                 Msg.NewSession -> toJSON <$> newSession conn stateRef
                 Msg.JoinSession id' pin -> toJSON <$> joinSession conn (Session id' pin) stateRef
                 Msg.LeaveSession -> toJSON <$> leaveSession conn stateRef
+                Msg.Login user -> toJSON <$> login user
                 Msg.Broadcast payload -> toJSON <$> broadcast payload conn stateRef
               pure $ case result of
                 Left err -> Msg.Failure (Just id) err

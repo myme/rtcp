@@ -101,6 +101,10 @@ p {
   margin: 1em;
 }
 
+small {
+  font-size: 60%;
+}
+
 svg.qr-code {
   margin: 1em;
 }

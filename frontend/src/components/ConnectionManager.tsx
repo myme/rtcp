@@ -17,10 +17,12 @@ interface Context {
   controlSocket?: ControlSocket;
   peerConnection?: PeerConnection;
   session?: Session;
+  user: { clientId?: string };
 }
 
 const ConnectionContext = React.createContext<Context>({
   connectionState: { status: "pending" },
+  user: {},
 });
 
 export function useConnectionState() {
@@ -43,8 +45,14 @@ export function useSession() {
   return session;
 }
 
+export function useUser() {
+  const { user } = useContext(ConnectionContext);
+  return user;
+}
+
 export default function ConnectionManager(props: Props) {
   const { onAddShare, onShareRemoved, onReset } = props;
+  const [clientId, setClientId] = useState<string>();
   const [connectionState, setConnectionState] = useState<ConnectionState>({
     status: "pending",
   });
@@ -55,6 +63,10 @@ export default function ConnectionManager(props: Props) {
       new ControlSocket({
         onError(error: string) {
           setConnectionState({ status: "error", error });
+        },
+        onTokenData(tokenData) {
+          setClientId(tokenData.token_clientId);
+          peerConnection.setClientId(tokenData.token_clientId);
         },
         onIceServersUpdated(iceServers) {
           peerConnection.setIceServers(iceServers);
@@ -105,11 +117,13 @@ export default function ConnectionManager(props: Props) {
     controlSocket,
     peerConnection,
     session,
+    user: { clientId },
   };
 
   return (
     <ConnectionContext.Provider value={context}>
       <Header small={connectionState.status === "connected"} />
+      <small>{`ClientID: ${clientId}`}</small>
       <Outlet />
     </ConnectionContext.Provider>
   );

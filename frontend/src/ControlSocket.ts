@@ -9,6 +9,7 @@ interface RequestHandler {
 
 interface Props {
   onError(error: string): void,
+  onTokenData(tokenData: TokenData): void,
   onIceServersUpdated(iceServers: RTCIceServer[]): void,
   onPeerJoined(): void,
   onBroadcast(message: any): void,
@@ -20,6 +21,12 @@ export interface Session {
   pin: string;
 }
 
+export type TokenData = {
+  token_clientId: string,
+  token_user: string | null,
+  token_logins: number,
+};
+
 import { getLogger } from './Logger';
 const logger = getLogger('ControlSocket');
 
@@ -28,16 +35,18 @@ export default class ControlSocket {
   private requestMap = new Map<number, RequestHandler>();
   private session?: Session;
   private socket?: WebSocket;
+  private socketReady?: Promise<WebSocket>;
 
   public constructor(readonly props: Props) {
     logger.info('new ControlSocket()');
   }
 
   private async getSocket(): Promise<WebSocket> {
-    if (this.socket) {
-      switch (this.socket.readyState) {
+    if (this.socketReady) {
+      const socket = await this.socketReady;
+      switch (socket.readyState) {
         case WebSocket.OPEN:
-          return this.socket;
+          return socket;
         case WebSocket.CONNECTING:
         case WebSocket.CLOSING:
         case WebSocket.CLOSED:
@@ -46,12 +55,17 @@ export default class ControlSocket {
       }
     }
 
-    this.socket = await this.connect();
+    this.socketReady = new Promise(async (resolve) => {
+      this.socket = await this.connect();
+      resolve(this.socket);
 
-    const iceConfig = await this.getIceConfig(location.hostname);
-    this.props.onIceServersUpdated(iceConfig);
+      await this.authenticate();
 
-    return this.socket;
+      const iceConfig = await this.getIceConfig(location.hostname);
+      this.props.onIceServersUpdated(iceConfig);
+    });
+
+    return this.socketReady;
   }
 
   private connect(): Promise<WebSocket> {
@@ -133,7 +147,13 @@ export default class ControlSocket {
     });
   }
 
-  async getIceConfig(hostname: string): Promise<RTCIceServer[]> {
+  public async authenticate() {
+    const str = document.cookie.match(/session=([^;]+)/) || [];
+    const response = await this.request('authenticate', { token: str[1] || '' });
+    return this.handleAuthResponse(response);
+  }
+
+  private async getIceConfig(hostname: string): Promise<RTCIceServer[]> {
     const result = await this.request('getIceConfig', { hostname });
 
     if (!Array.isArray(result)) {
@@ -151,6 +171,11 @@ export default class ControlSocket {
   public async broadcast(type: string, data: object) {
     const result = await this.request('broadcast', { params: { type, ...data } });
     logger.info(`ControlSocket::broadcast(): response: ${result}`);
+  }
+
+  public async login(username: string) {
+    const response = await this.request('login', { username });
+    return this.handleAuthResponse(response);
   }
 
   public async newSession(): Promise<string> {
@@ -188,6 +213,32 @@ export default class ControlSocket {
 
     delete this.session;
     this.props.setSession();
+  }
+
+  private handleAuthResponse(response: unknown): TokenData {
+    const hasStructure = Array.isArray(response) &&
+      response.length === 2 &&
+      typeof response[0] === 'object' &&
+      typeof response[0].token_clientId === 'string' &&
+      (typeof response[0].token_user === 'string' || response[0].token_user === null) &&
+      typeof response[0].token_logins === 'number' &&
+      typeof response[1] === 'string';
+
+    if (!hasStructure) {
+      throw new Error(`Invalid "authorize" response: ${response}`);
+    }
+
+    const data = {
+      token_clientId: response[0].token_clientId,
+      token_user: response[0].token_user,
+      token_logins: response[0].token_logins,
+    };
+
+    const token = response[1];
+
+    document.cookie = `session=${token}; path=/; max-age=1209600; sameSite=strict`;
+    this.props.onTokenData(data);
+    return data;
   }
 }
 

@@ -3,11 +3,14 @@ version: '0.1.0.0'
 dependencies:
   - base == 4.*
   - aeson
+  - bytestring
+  - clientsession
   - containers
   - http-types
   - optparse-applicative
   - random
   - text
+  - uuid
   - wai
   - wai-extra
   - wai-middleware-static

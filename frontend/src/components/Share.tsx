@@ -18,7 +18,7 @@ interface Props {
   shares: IShare[],
   onCopyItem(id: string): void,
   onRemoveShare(id: string): void,
-  onSend(item: IItem): IShare,
+  onSend(clientId: string, item: IItem): IShare,
 }
 
 export default function Share({ session, shares, onCopyItem, onRemoveShare, onSend }: Props) {
@@ -34,11 +34,16 @@ export default function Share({ session, shares, onCopyItem, onRemoveShare, onSe
   }
 
   const onSendHandler = (item: IItem) => {
-    const share = onSend(item);
     if (!peerConnection) {
       logger.error('App::onSend(): No peer connection');
       return;
     }
+    const clientId = peerConnection.getClientId();
+    if (!clientId) {
+      logger.error('App::onSend(): No client ID');
+      return;
+    }
+    const share = onSend(clientId, item);
     peerConnection.sendShare(share);
   };
 
@@ -52,7 +57,7 @@ export default function Share({ session, shares, onCopyItem, onRemoveShare, onSe
   };
 
   return (
-    <>
+    <div>
       <Link to={`/${session.id}`} className="button">
         {prettifyShareId(session.id)}
       </Link>
@@ -62,9 +67,10 @@ export default function Share({ session, shares, onCopyItem, onRemoveShare, onSe
         <>
           <hr />
           <ul className="unstyled">
-            {shares.map(({ id, item }, idx) => (
+            {shares.map(({ clientId, id, item }, idx) => (
               <li key={idx}>
                 <Item
+                  clientId={clientId}
                   item={item}
                   onCopyItem={() => onCopyItem(id)}
                   onRemoveItem={() => onRemoveShareHandler(id)}
@@ -74,6 +80,6 @@ export default function Share({ session, shares, onCopyItem, onRemoveShare, onSe
           </ul>
         </>
       )}
-    </>
+    </div>
   );
 }

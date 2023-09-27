@@ -46,6 +46,8 @@ data Request
   | NewSession
   | JoinSession {request_sessionId :: String, request_sessionPin :: String}
   | LeaveSession
+  | Authenticate {request_token :: String}
+  | Login {request_username :: String}
   | Broadcast {request_params :: JSON.Value}
   deriving (Generic, Show)
 

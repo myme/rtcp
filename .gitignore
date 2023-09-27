@@ -8,3 +8,4 @@ dist-newstyle
 .log
 result
 *.cabal
+/server/client_session_key.aes
