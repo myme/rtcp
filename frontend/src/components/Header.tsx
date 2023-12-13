@@ -1,7 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-import logo from '../../favicon.svg';
+import logoBig from '../../phoop-big.png';
+import logoSmall from '../../phoop-small.png';
 
 interface Props {
   small?: boolean;
@@ -12,21 +13,17 @@ export default function Header(props: Props) {
 
   if (small) {
     return (
-      <Link to="/">
-        <h2>
-          <img src={logo} className="app-logo" alt="logo" />
-          <span>rtcp</span>
-        </h2>
-      </Link>
+      <h2>
+        <Link to="/">
+          <img src={logoSmall} className="app-logo-small" alt="logo" />
+        </Link>
+      </h2>
     );
   }
 
   return (
     <Link to="/">
-      <h1>
-        <img src={logo} className="app-logo" alt="logo" />
-        <span>rtcp</span>
-      </h1>
+      <img src={logoBig} className="app-logo" height="300px" alt="logo" />
     </Link>
   )
 }

@@ -122,7 +122,7 @@ export default function ConnectionManager(props: Props) {
 
   return (
     <ConnectionContext.Provider value={context}>
-      <Header small={connectionState.status === "connected"} />
+      <Header small={true} />
       <small>{`ClientID: ${clientId}`}</small>
       <Outlet />
     </ConnectionContext.Provider>
