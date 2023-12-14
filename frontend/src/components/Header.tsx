@@ -23,7 +23,7 @@ export default function Header(props: Props) {
 
   return (
     <Link to="/">
-      <img src={logoBig} className="app-logo" height="300px" alt="logo" />
+      <img src={logoBig} className="app-logo" width="500px" alt="logo" />
     </Link>
   )
 }

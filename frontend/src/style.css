@@ -39,7 +39,6 @@ spec: # https://spec.draculatheme.com
 * {
   box-sizing: border-box;
   font-family: Avenir, Helvetica, Arial, sans-serif;
-  margin: 0.2em;
 }
 
 body {
@@ -107,6 +106,7 @@ a.button, button, input, select {
   display: inline-block;
   margin-left: 0.2em;
   margin-right: 0.2em;
+  margin-bottom: 0.2em;
   font-size: 0.8em;
   color: var(--foreground);
   background-color: var(--selection);
@@ -115,7 +115,12 @@ a.button, button, input, select {
   padding: 0.7em;
 }
 
-@media (max-width: 450px) {
+@media (max-width: 500px) {
+  .app-logo {
+    width: 300px;
+    height: auto;
+  }
+
   form .group > * {
     width: 100%;
     display-block: 100%;
@@ -154,7 +159,7 @@ button.unstyled {
   background: none;
 }
 
-@media (min-width: 450px) {
+@media (min-width: 500px) {
   form .group > * {
     margin-right: 0;
     margin-left: 0;
