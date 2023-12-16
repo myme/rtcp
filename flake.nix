@@ -52,6 +52,9 @@
         devShells = {
           frontend = pkgs.rtcp.frontend.shell;
           server = pkgs.rtcp.server.shell;
+          utils = pkgs.mkShell {
+            buildInputs = [ pkgs.rtcp.dev ];
+          };
         };
 
       in {
