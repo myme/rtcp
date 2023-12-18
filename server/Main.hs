@@ -8,11 +8,13 @@ import Control.Monad (forM_, void, (>=>))
 import Data.Aeson (FromJSON, ToJSON, (.=))
 import qualified Data.Aeson as JSON
 import qualified Data.ByteString.Char8 as BS8
+import Data.Function ((&))
 import Data.Functor ((<&>))
 import qualified Data.IORef as Ref
 import qualified Data.List as List
 import Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
+import Data.String (fromString)
 import Data.Text (Text)
 import qualified Data.Text as T
 import qualified Data.UUID as UUID
@@ -382,8 +384,10 @@ main = do
   let getNextId = Ref.atomicModifyIORef' nextId $ \id -> (id + 1, id)
   state <- Ref.newIORef (State [] Map.empty)
 
+  let settings = Warp.defaultSettings & Warp.setPort port & Warp.setHost (fromString host)
   Log.info $ "Starting server on http://" <> host <> ":" <> show port
-  Warp.run port $
+
+  Warp.runSettings settings $
     wsMiddleware getNextId state $
       routeMiddleware $
         staticMiddleware
