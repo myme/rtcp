@@ -9,3 +9,4 @@ dist-newstyle
 result
 *.cabal
 /server/client_session_key.aes
+/.env
