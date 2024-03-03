@@ -7,7 +7,7 @@
     tag = "latest";
     contents = with rtcp; [ server.server frontend.static ];
     config = {
-      Cmd = [ "rtcp-server" ];
+      Cmd = [ "rtcp-server" "--host" "0.0.0.0" "--port" "8000" ];
       ExposedPorts = { "8000/tcp" = { }; };
     };
   };
