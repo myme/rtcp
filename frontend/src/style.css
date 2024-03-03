@@ -80,7 +80,7 @@ a.button, button, input, select {
   padding: 0.7em;
 }
 
-@media (max-width: 450px) {
+@media (max-width: 455px) {
   form .group > * {
     width: 100%;
     display-block: 100%;
@@ -119,7 +119,7 @@ button.unstyled {
   background: none;
 }
 
-@media (min-width: 450px) {
+@media (min-width: 455px) {
   form .group > * {
     margin-right: 0;
     margin-left: 0;
