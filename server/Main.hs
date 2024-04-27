@@ -30,6 +30,7 @@ import qualified Network.Wai.Middleware.Rewrite as Rewrite
 import qualified Network.Wai.Middleware.Static as Static
 import qualified Network.WebSockets as WS
 import qualified Options.Applicative as Opts
+import qualified System.IO as IO
 import qualified System.Random as R
 import qualified Web.ClientSession as Session
 import Prelude hiding (id)
@@ -385,6 +386,7 @@ main = do
   state <- Ref.newIORef (State [] Map.empty)
 
   let settings = Warp.defaultSettings & Warp.setPort port & Warp.setHost (fromString host)
+  IO.hSetBuffering IO.stdout IO.LineBuffering
   Log.info $ "Starting server on http://" <> host <> ":" <> show port
 
   Warp.runSettings settings $
