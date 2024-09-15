@@ -57,12 +57,14 @@ export default function Share({ session, shares, onCopyItem, onRemoveShare, onSe
   };
 
   return (
-    <div>
-      <Link to={`/${session.id}`} className="button">
-        {prettifyShareId(session.id)}
-      </Link>
-      {' '}
-      <ShareForm onSubmit={onSendHandler} />
+    <>
+      <div>
+        <Link to={`/${session.id}`} className="button">
+          {prettifyShareId(session.id)}
+        </Link>
+        {' '}
+        <ShareForm onSubmit={onSendHandler} />
+      </div>
       {!!shares.length && (
         <>
           <hr />
@@ -80,6 +82,6 @@ export default function Share({ session, shares, onCopyItem, onRemoveShare, onSe
           </ul>
         </>
       )}
-    </div>
+    </>
   );
 }

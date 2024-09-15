@@ -9,7 +9,7 @@ import { getLogger } from "../Logger";
 import { useControlSocket } from "./ConnectionManager";
 import PinForm from "./PinForm";
 
-const logger = getLogger('Pending');
+const logger = getLogger("Pending");
 
 interface PendingProps {
   session?: Session;
@@ -54,7 +54,7 @@ export default function Pending({ session, shareId }: PendingProps) {
   return (
     <>
       <h1>
-        Share ID:
+        {"Share ID: "}
         <Link to={sessionWithPin}>{prettifyShareId(session.id)}</Link>
       </h1>
       <h1>{`PIN: ${session.pin}`}</h1>

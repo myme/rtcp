@@ -1,7 +1,8 @@
 * {
   box-sizing: border-box;
   font-family: Avenir, Helvetica, Arial, sans-serif;
-  margin: 0.2em;
+  margin: 0;
+  padding: 0;
 }
 
 :root {
@@ -17,7 +18,6 @@ body {
   -moz-osx-font-smoothing: grayscale;
   font-size: 20px;
   color: #2c3e50;
-  margin-top: 3em;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -25,21 +25,61 @@ body {
 }
 
 main {
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   min-width: 350px;
+  width: 100%;
 }
 
 main > * {
-  margin-top: 0.7em;
+  margin: 0.5em;
 }
 
-h1 img.app-logo, h2 img.app-logo {
+main > .container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 800px;
+  padding: 0.5em;
+  text-align: center;
+  width: 100%;
+}
+
+main > .container > * {
+  margin: 0.5em;
+}
+
+header {
+  margin: 0;
+  padding: 0.5em;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+header h1,
+header h2 {
+  padding-left: 0.2em;
+}
+
+header a.login {
+  font-size: 0.8em;
+}
+
+.user-banner span {
+  font-size: 0.8em;
+}
+
+h1 img.app-logo,
+h2 img.app-logo {
   margin-bottom: -0.15em;
   height: 1em;
 }
 
 h1 {
-  font-size: 2em;
+  font-size: 1.75em;
 }
 
 a {
@@ -68,7 +108,10 @@ form.inline {
   display: inline-block;
 }
 
-a.button, button, input, select {
+a.button,
+button,
+input,
+select {
   display: inline-block;
   margin-left: 0.2em;
   margin-right: 0.2em;
@@ -80,10 +123,15 @@ a.button, button, input, select {
   padding: 0.7em;
 }
 
-@media (max-width: 455px) {
+@media (max-width: 549px) {
+  header {
+    min-width: 400px;
+  }
+
   form .group > * {
     width: 100%;
     display-block: 100%;
+    margin: 0.2em;
   }
 }
 
@@ -97,10 +145,6 @@ hr {
   margin-right: auto;
 }
 
-p {
-  margin: 1em;
-}
-
 small {
   font-size: 60%;
 }
@@ -109,7 +153,8 @@ svg.qr-code {
   margin: 1em;
 }
 
-a.button:hover, button:hover {
+a.button:hover,
+button:hover {
   background-color: #d0d0d7;
   text-decoration: none;
 }
@@ -119,8 +164,9 @@ button.unstyled {
   background: none;
 }
 
-@media (min-width: 455px) {
+@media (min-width: 550px) {
   form .group > * {
+    margin: 0.5em;
     margin-right: 0;
     margin-left: 0;
     border-left: none;
@@ -145,11 +191,11 @@ button.unstyled {
 
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
-    display: none;
+  display: none;
 }
 
-input[type=number] {
-    -moz-appearance: textfield;
+input[type="number"] {
+  -moz-appearance: textfield;
 }
 
 ul.unstyled {
@@ -157,11 +203,12 @@ ul.unstyled {
   list-style: none;
   border: var(--border-thin);
   border-radius: 0.5em;
+  width: 100%;
 }
 
 ul.unstyled li {
   border-bottom: var(--border-thin);
-  padding: 0;
+  padding: 0.5em;
   display: flex;
   align-items: center;
   justify-content: space-between;

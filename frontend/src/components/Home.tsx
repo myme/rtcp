@@ -3,10 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 
 import Header from "./Header";
 import JoinForm from "./JoinForm";
-import UserInfo from "./UserInfo";
 
 export default function Home() {
-  const enableOIDC = Boolean(localStorage.getItem("enableOIDC"));
   const navigate = useNavigate();
 
   const joinShare = useCallback(
@@ -26,12 +24,6 @@ export default function Home() {
           Start a new share
         </Link>
       </p>
-      {enableOIDC && (
-        <>
-          <hr />
-          <UserInfo />
-        </>
-      )}
     </>
   );
 }
