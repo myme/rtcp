@@ -1048,13 +1048,13 @@ let
         sha512 = "+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==";
       };
     };
-    "vite-4.5.2" = {
+    "vite-4.5.3" = {
       name = "vite";
       packageName = "vite";
-      version = "4.5.2";
+      version = "4.5.3";
       src = fetchurl {
-        url = "https://registry.npmjs.org/vite/-/vite-4.5.2.tgz";
-        sha512 = "tBCZBNSBbHQkaGyhGCDUGqeo2ph8Fstyp6FMSvTtsXeZSPpSMGlviAOav2hxVTqFcx8Hj/twtWKsMJXNY0xI8w==";
+        url = "https://registry.npmjs.org/vite/-/vite-4.5.3.tgz";
+        sha512 = "kQL23kMeX92v3ph7IauVkXkikdDRsYMGTVl5KY2E9OY4ONLvkHf04MDTbnfo6NKxZiDLWzVpP5oTa8hQD8U3dg==";
       };
     };
   };
@@ -1180,7 +1180,7 @@ let
       sources."to-fast-properties-2.0.0"
       sources."typescript-4.5.4"
       sources."uuid-8.3.2"
-      sources."vite-4.5.2"
+      sources."vite-4.5.3"
     ];
     buildInputs = globalBuildInputs;
     meta = {
