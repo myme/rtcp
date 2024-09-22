@@ -1,13 +1,13 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState } from "react";
 
-import { Item as IItem } from '../PeerConnection';
-import Icon from './Icon';
+import { Item as IItem } from "../PeerConnection";
+import Icon from "./Icon";
 
 interface Props {
-  clientId: string,
-  item: IItem,
-  onCopyItem(): void,
-  onRemoveItem(): void,
+  clientId: string;
+  item: IItem;
+  onCopyItem(): void;
+  onRemoveItem(): void;
 }
 
 export default function Item(props: Props) {
@@ -15,17 +15,23 @@ export default function Item(props: Props) {
   const { clientId, item, onCopyItem, onRemoveItem } = props;
 
   const toggleShowHidden = useCallback(() => {
-    setShowHidden(v => !v);
+    setShowHidden((v) => !v);
   }, [setShowHidden]);
 
-  const hideHiddenBtnClass = !item.hidden ? 'hidden' : '';
+  const hideHiddenBtnClass = !item.hidden ? "hidden" : "";
 
   return (
     <>
       <Output item={item} showHidden={showHidden} />
-      <small title={`From client ID: ${clientId}`}>{`${clientId.substring(0, 9)}…`}</small>
+      <small
+        title={`From client ID: ${clientId}`}
+      >{`${clientId.substring(0, 9)}…`}</small>
       <span>
-        <button className={`unstyled ${hideHiddenBtnClass}`} onClick={toggleShowHidden} title="Show item">
+        <button
+          className={`unstyled ${hideHiddenBtnClass}`}
+          onClick={toggleShowHidden}
+          title="Show item"
+        >
           {showHidden ? <Icon icon="eye-slash" /> : <Icon icon="eye" />}
         </button>
         <button className="unstyled" onClick={onCopyItem} title="Copy item">
@@ -39,10 +45,7 @@ export default function Item(props: Props) {
   );
 }
 
-function Output(props: {
-  item: IItem;
-  showHidden: boolean;
-}) {
+function Output(props: { item: IItem; showHidden: boolean }) {
   const { item, showHidden } = props;
   const { value, type, hidden } = item;
 
@@ -50,9 +53,13 @@ function Output(props: {
     return <span>***</span>;
   }
 
-  if (type === 'link') {
+  if (type === "link") {
     const href = value.match(/https?:\/\//) ? value : `https://${value}`;
-    return <a href={href} target="_blank">{value}</a>;
+    return (
+      <a href={href} target="_blank">
+        {value}
+      </a>
+    );
   }
 
   return <span>{value}</span>;

@@ -1,24 +1,23 @@
-type LogLevel = 'debug' | 'info' | 'log' | 'warning' | 'error';
+type LogLevel = "debug" | "info" | "log" | "warning" | "error";
 
-let levelsToLog = new Set<LogLevel>(['log', 'warning', 'error']);
+let levelsToLog = new Set<LogLevel>(["log", "warning", "error"]);
 
 export function setLevel(level: LogLevel) {
   levelsToLog.clear();
 
   switch (level) {
-    case 'debug':
-      levelsToLog.add('debug');
-    case 'info':
-      levelsToLog.add('info');
-    case 'log':
-      levelsToLog.add('log');
-    case 'warning':
-      levelsToLog.add('warning');
-    case 'error':
-      levelsToLog.add('error');
+    case "debug":
+      levelsToLog.add("debug");
+    case "info":
+      levelsToLog.add("info");
+    case "log":
+      levelsToLog.add("log");
+    case "warning":
+      levelsToLog.add("warning");
+    case "error":
+      levelsToLog.add("error");
   }
 }
-
 
 export class Logger {
   constructor(readonly name: string) {}
@@ -28,31 +27,31 @@ export class Logger {
   }
 
   public log(...data: any[]) {
-    if (levelsToLog.has('log')) {
+    if (levelsToLog.has("log")) {
       console.log(this.prefix(), ...data);
     }
   }
 
   public debug(...data: any[]) {
-    if (levelsToLog.has('debug')) {
+    if (levelsToLog.has("debug")) {
       console.debug(this.prefix(), ...data);
     }
   }
 
   public info(...data: any[]) {
-    if (levelsToLog.has('info')) {
+    if (levelsToLog.has("info")) {
       console.info(this.prefix(), ...data);
     }
   }
 
   public warning(...data: any[]) {
-    if (levelsToLog.has('warning')) {
+    if (levelsToLog.has("warning")) {
       console.warn(this.prefix(), ...data);
     }
   }
 
   public error(...data: any[]) {
-    if (levelsToLog.has('error')) {
+    if (levelsToLog.has("error")) {
       console.error(this.prefix(), ...data);
     }
   }

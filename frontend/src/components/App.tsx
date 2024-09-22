@@ -40,12 +40,14 @@ export default function App() {
         <Route
           path="/:shareId"
           element={
-            <Session
-              shares={shares}
-              onCopyItem={onCopyItem}
-              onRemoveShare={onRemoveLocalShare}
-              onShare={onShare}
-            />
+            <div className="container">
+              <Session
+                shares={shares}
+                onCopyItem={onCopyItem}
+                onRemoveShare={onRemoveLocalShare}
+                onShare={onShare}
+              />
+            </div>
           }
         />
       </Route>

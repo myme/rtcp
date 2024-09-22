@@ -1,22 +1,28 @@
-import React, { ChangeEvent, FormEvent, useCallback, useState } from 'react';
+import React, { ChangeEvent, FormEvent, useCallback, useState } from "react";
 
 interface Props {
-  joinShare(sessionId: string): void,
+  joinShare(sessionId: string): void;
 }
 
 export default function JoinForm(props: Props) {
   const shareIdLength = 6;
   const { joinShare } = props;
-  const [sessionId, setSessionId] = useState('');
+  const [sessionId, setSessionId] = useState("");
 
-  const onJoinSessionIdChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
-    setSessionId(event.target.value.slice(0, 6));
-  }, [setSessionId]);
+  const onJoinSessionIdChange = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      setSessionId(event.target.value.slice(0, 6));
+    },
+    [setSessionId],
+  );
 
-  const onFormSubmit = useCallback((event: FormEvent) => {
-    event.preventDefault();
-    joinShare(sessionId);
-  }, [joinShare, sessionId]);
+  const onFormSubmit = useCallback(
+    (event: FormEvent) => {
+      event.preventDefault();
+      joinShare(sessionId);
+    },
+    [joinShare, sessionId],
+  );
 
   return (
     <form onSubmit={onFormSubmit}>

@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 
 interface Props {
-  onSubmit(pin: string): void,
+  onSubmit(pin: string): void;
 }
 
 export default function Form({ onSubmit }: Props): JSX.Element {
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState("");
 
   const inputChange: React.ChangeEventHandler<HTMLInputElement> = (event) => {
     setInput(event.target.value);
@@ -26,8 +26,10 @@ export default function Form({ onSubmit }: Props): JSX.Element {
           onChange={inputChange}
           autoFocus
         />
-        <button type="submit" disabled={!input.trim().length}>Connect</button>
+        <button type="submit" disabled={!input.trim().length}>
+          Connect
+        </button>
       </div>
     </form>
-  )
+  );
 }

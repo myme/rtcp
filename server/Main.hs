@@ -1,12 +1,17 @@
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE OverloadedRecordDot #-}
 
 module Main (main) where
 
+import qualified Auth
 import Control.Applicative ((<**>))
 import Control.Exception (catch)
 import Control.Monad (forM_, void, (>=>))
+import Crypto.Hash (Digest, SHA1)
+import Crypto.MAC.HMAC (HMAC (hmacGetDigest), hmac)
 import Data.Aeson (FromJSON, ToJSON, (.=))
 import qualified Data.Aeson as JSON
+import Data.ByteArray.Encoding (Base (Base64), convertToBase)
 import qualified Data.ByteString.Char8 as BS8
 import Data.Function ((&))
 import Data.Functor ((<&>))
@@ -17,12 +22,16 @@ import qualified Data.Map.Strict as Map
 import Data.String (fromString)
 import Data.Text (Text)
 import qualified Data.Text as T
+import qualified Data.Text.Encoding as T
+import Data.Time.Clock.POSIX (getPOSIXTime)
 import qualified Data.UUID as UUID
 import qualified Data.UUID.V4 as UUID
+import qualified Data.Vault.Lazy as Vault
 import GHC.Generics (Generic)
 import qualified Log
 import qualified Messages as Msg
 import qualified Network.HTTP.Types as Http
+import Network.Wai (Request (vault))
 import qualified Network.Wai as Wai
 import qualified Network.Wai.Handler.Warp as Warp
 import qualified Network.Wai.Handler.WebSockets as WS
@@ -30,6 +39,7 @@ import qualified Network.Wai.Middleware.Rewrite as Rewrite
 import qualified Network.Wai.Middleware.Static as Static
 import qualified Network.WebSockets as WS
 import qualified Options.Applicative as Opts
+import System.Environment (getEnv)
 import qualified System.IO as IO
 import qualified System.Random as R
 import qualified Web.ClientSession as Session
@@ -112,9 +122,31 @@ sameSession sessionId = (== Just sessionId) . snd . snd
 leftPad :: Int -> Char -> String -> String
 leftPad n c s = replicate (n - length s) c <> s
 
-getIceConfig :: String -> [IceConfig]
-getIceConfig hostname =
-  [IceConfig ["stun:" <> T.pack hostname <> ":3478"] Nothing Nothing]
+-- | Timeout for TURN credentials in seconds
+turnCredTimeout :: (Num a) => a
+turnCredTimeout = 15 * 60
+
+-- | Get ICE configuration for a given STUN/TURN server and user
+getIceConfig :: String -> Maybe String -> IO [IceConfig]
+getIceConfig hostname maybeUser = case maybeUser of
+  Nothing -> pure [stun]
+  Just username -> do
+    secret <- T.pack <$> getEnv "TURN_SECRET_KEY"
+    expiry <- floor . toRational . (+ turnCredTimeout) <$> getPOSIXTime
+    let username' = T.pack $ show (expiry :: Int) <> ":" <> username
+    let password = T.decodeUtf8' $ convertToBase Base64 $ getMd5Digest secret username'
+    case password of
+      Left _ -> pure [stun]
+      Right password' -> pure [stun, turn username' password']
+  where
+    stun = IceConfig ["stun:" <> T.pack hostname <> ":3478"] Nothing Nothing
+    turn username password =
+      IceConfig
+        ["turn:" <> T.pack hostname <> ":3478"]
+        (Just username)
+        (Just password)
+    getMd5Digest :: Text -> Text -> Digest SHA1
+    getMd5Digest secret username = hmacGetDigest $ hmac (T.encodeUtf8 secret) (T.encodeUtf8 username)
 
 newSession :: Connection -> StateRef -> IO (Either String Session)
 newSession conn stateRef = do
@@ -283,8 +315,8 @@ broadcast payload conn state = do
         let others = filter (not . sameConnection conn) $ filter (sameSession sessionId) state'
          in Right (sessionId, others)
 
-wsApp :: IO Int -> StateRef -> WS.ServerApp
-wsApp getConnId stateRef req = do
+wsApp :: Maybe String -> IO Int -> StateRef -> WS.ServerApp
+wsApp username getConnId stateRef req = do
   conn <- Connection <$> getConnId <*> WS.acceptRequest req
   Ref.atomicModifyIORef' stateRef $ \state -> (addConnection conn state, ())
   go conn
@@ -304,7 +336,7 @@ wsApp getConnId stateRef req = do
             Right (Msg.RequestWithId id request) -> do
               result <- case request of
                 Msg.Authenticate token -> toJSON <$> authenticate token conn stateRef
-                Msg.GetIceConfig hostname -> pure . Right . JSON.toJSON $ getIceConfig hostname
+                Msg.GetIceConfig hostname -> Right . JSON.toJSON <$> getIceConfig hostname username
                 Msg.NewSession -> toJSON <$> newSession conn stateRef
                 Msg.JoinSession id' pin -> toJSON <$> joinSession conn (Session id' pin) stateRef
                 Msg.LeaveSession -> toJSON <$> leaveSession conn stateRef
@@ -328,9 +360,11 @@ handleWSError state conn = \case
   where
     cleanupConnection = void $ Ref.atomicModifyIORef' state (tryUpdate $ removeConnection conn)
 
-wsMiddleware :: IO Int -> StateRef -> Wai.Middleware
-wsMiddleware getNextId stateRef =
-  WS.websocketsOr WS.defaultConnectionOptions (wsApp getNextId stateRef)
+wsMiddleware :: Vault.Key String -> IO Int -> StateRef -> Wai.Middleware
+wsMiddleware userKey getNextId stateRef app req = do
+  -- Sniff out user info from auth middleware
+  let username = Vault.lookup userKey req.vault
+  WS.websocketsOr WS.defaultConnectionOptions (wsApp username getNextId stateRef) app req
 
 routeMiddleware :: Wai.Middleware
 routeMiddleware = Rewrite.rewritePureWithQueries rewrite
@@ -389,9 +423,12 @@ main = do
   IO.hSetBuffering IO.stdout IO.LineBuffering
   Log.info $ "Starting server on http://" <> host <> ":" <> show port
 
+  userKey <- Vault.newKey
+  oidcConfig <- Auth.mkOIDCConfig userKey
   Warp.runSettings settings $
-    wsMiddleware getNextId state $
-      routeMiddleware $
-        staticMiddleware
-          staticRoot
-          fallbackApp
+    Auth.authMiddleware oidcConfig $
+      wsMiddleware userKey getNextId state $
+        routeMiddleware $
+          staticMiddleware
+            staticRoot
+            fallbackApp

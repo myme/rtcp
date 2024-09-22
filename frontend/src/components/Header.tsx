@@ -1,32 +1,22 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React from "react";
+import { Link } from "react-router-dom";
 
-import logo from '../../favicon.svg';
+import logo from "../../favicon.svg";
+import UserInfo from "./UserInfo";
 
-interface Props {
-  small?: boolean;
-}
-
-export default function Header(props: Props) {
-  const { small } = props;
-
-  if (small) {
-    return (
-      <Link to="/">
-        <h2>
-          <img src={logo} className="app-logo" alt="logo" />
-          <span>rtcp</span>
-        </h2>
-      </Link>
-    );
-  }
+export default function Header() {
+  let link = (
+    <Link to="/">
+      <h2>
+        <img src={logo} className="app-logo" alt="logo" /> <span>rtcp</span>
+      </h2>
+    </Link>
+  );
 
   return (
-    <Link to="/">
-      <h1>
-        <img src={logo} className="app-logo" alt="logo" />
-        <span>rtcp</span>
-      </h1>
-    </Link>
-  )
+    <header>
+      {link}
+      <UserInfo />
+    </header>
+  );
 }

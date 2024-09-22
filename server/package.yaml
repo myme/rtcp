@@ -5,12 +5,20 @@ dependencies:
   - aeson
   - bytestring
   - clientsession
+  - cookie
   - containers
+  - cryptonite
+  - http-client
+  - http-client-tls
   - http-types
+  - memory
+  - oidc-client
   - optparse-applicative
   - random
   - text
+  - time
   - uuid
+  - vault
   - wai
   - wai-extra
   - wai-middleware-static
@@ -21,6 +29,7 @@ executables:
   rtcp-server:
     main: Main.hs
     other-modules:
+      - Auth
       - Log
       - Messages
     default-extensions:
