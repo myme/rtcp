@@ -4,7 +4,7 @@
 
 Exchange stuff between things using WebRTC.
 
-https://rtcp.myme.no
+https://rtcp.cc
 
 ## Development
 
