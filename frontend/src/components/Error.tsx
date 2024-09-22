@@ -1,8 +1,8 @@
-import React from 'react';
+import React from "react";
 import { Link } from "react-router-dom";
 
 interface Props {
-  error?: string,
+  error?: string;
 }
 
 export default function Error({ error }: Props) {

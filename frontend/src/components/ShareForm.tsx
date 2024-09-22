@@ -3,7 +3,7 @@ import { Item, ItemType } from "../PeerConnection";
 import Icon from "./Icon";
 
 interface Props {
-  onSubmit(item: Item): void,
+  onSubmit(item: Item): void;
 }
 
 function capitalize(input: string) {
@@ -12,18 +12,18 @@ function capitalize(input: string) {
 
 export default function Form(props: Props): JSX.Element {
   const { onSubmit } = props;
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState("");
   const [autoType, setAutoType] = useState(true);
   const [hidden, setHidden] = useState(false);
-  const [type, setType] = useState<ItemType>('text');
+  const [type, setType] = useState<ItemType>("text");
 
   const submit: React.FormEventHandler = (event) => {
     event.preventDefault();
     onSubmit({ type, value: input, hidden });
-    setInput('');
+    setInput("");
     setAutoType(true);
     setHidden(false);
-    setType('text');
+    setType("text");
   };
 
   const inputChange: React.ChangeEventHandler<HTMLInputElement> = (event) => {
@@ -31,9 +31,9 @@ export default function Form(props: Props): JSX.Element {
     setInput(value);
     if (autoType) {
       if (value.match(/^https?:\/\//) || value.match(/\w+\.\w{2,}/)) {
-        setType('link');
+        setType("link");
       } else {
-        setType('text');
+        setType("text");
       }
     }
   };
@@ -42,39 +42,43 @@ export default function Form(props: Props): JSX.Element {
     setAutoType(false);
     const value = event.target.value.toLowerCase();
     switch (value) {
-      case 'link':
-      case 'text':
+      case "link":
+      case "text":
         // case 'file':
         setType(value);
     }
   };
 
-  const types: ItemType[] = ['link', 'text', /* 'file' */];
+  const types: ItemType[] = ["link", "text" /* 'file' */];
   const secretIcon = hidden ? "eye-slash" : "eye";
 
   return (
     <form id="client" className="inline" onSubmit={submit}>
       <div className="group">
         <select value={type} onChange={typeChange}>
-          {types.map(type => (
-            <option key={type} value={type}>{capitalize(type)}</option>
+          {types.map((type) => (
+            <option key={type} value={type}>
+              {capitalize(type)}
+            </option>
           ))}
         </select>
         <button
           type="button"
-          onClick={() => setHidden(h => !h)}
+          onClick={() => setHidden((h) => !h)}
           title="Toggle hidden input"
         >
           <Icon icon={secretIcon} />
         </button>
         <input
-          type={hidden ? 'password' : type}
+          type={hidden ? "password" : type}
           placeholder="Input"
           value={input}
           onChange={inputChange}
           autoFocus
         />
-        <button type="submit" disabled={!input.trim().length}>Share</button>
+        <button type="submit" disabled={!input.trim().length}>
+          Share
+        </button>
       </div>
     </form>
   );

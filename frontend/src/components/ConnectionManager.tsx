@@ -5,7 +5,7 @@ import ControlSocket, { Session } from "../ControlSocket";
 import { getLogger } from "../Logger";
 import PeerConnection, { ConnectionState } from "../PeerConnection";
 import { Share } from "../share";
-import Header from './Header';
+import Header from "./Header";
 
 const logger = getLogger("ConnectionManager");
 
@@ -83,7 +83,7 @@ export default function ConnectionManager(props: Props) {
         },
         setSession,
       }),
-    []
+    [],
   );
 
   const peerConnection = useMemo(
@@ -99,7 +99,7 @@ export default function ConnectionManager(props: Props) {
         onShare: onAddShare,
         onRemoveShare: onShareRemoved,
       }),
-    []
+    [],
   );
 
   // Cleanup
@@ -113,7 +113,7 @@ export default function ConnectionManager(props: Props) {
         onReset();
       }, 0);
     },
-    []
+    [],
   );
 
   const context = {

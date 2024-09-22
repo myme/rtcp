@@ -1,5 +1,7 @@
-const SIGNALING_SERVER_HOST = import.meta.env.VITE_SIGNALING_SERVER || location.host;
-const SIGNALING_SERVER_PROTO = import.meta.env.DEV || location.protocol === 'http:' ? 'ws:' : 'wss:';
+const SIGNALING_SERVER_HOST =
+  import.meta.env.VITE_SIGNALING_SERVER || location.host;
+const SIGNALING_SERVER_PROTO =
+  import.meta.env.DEV || location.protocol === "http:" ? "ws:" : "wss:";
 const SIGNALING_SERVER_WS_URL = `${SIGNALING_SERVER_PROTO}//${SIGNALING_SERVER_HOST}`;
 
 interface RequestHandler {
@@ -8,12 +10,12 @@ interface RequestHandler {
 }
 
 interface Props {
-  onError(error: string): void,
-  onTokenData(tokenData: TokenData): void,
-  onIceServersUpdated(iceServers: RTCIceServer[]): void,
-  onPeerJoined(clientID: string): void,
-  onBroadcast(message: any): void,
-  setSession(session?: Session): void,
+  onError(error: string): void;
+  onTokenData(tokenData: TokenData): void;
+  onIceServersUpdated(iceServers: RTCIceServer[]): void;
+  onPeerJoined(clientID: string): void;
+  onBroadcast(message: any): void;
+  setSession(session?: Session): void;
 }
 
 export interface Session {
@@ -22,13 +24,13 @@ export interface Session {
 }
 
 export type TokenData = {
-  token_clientId: string,
-  token_user: string | null,
-  token_logins: number,
+  token_clientId: string;
+  token_user: string | null;
+  token_logins: number;
 };
 
-import { getLogger } from './Logger';
-const logger = getLogger('ControlSocket');
+import { getLogger } from "./Logger";
+const logger = getLogger("ControlSocket");
 
 export default class ControlSocket {
   private requestId = 0;
@@ -38,7 +40,7 @@ export default class ControlSocket {
   private socketReady?: Promise<WebSocket>;
 
   public constructor(readonly props: Props) {
-    logger.info('new ControlSocket()');
+    logger.info("new ControlSocket()");
   }
 
   private async getSocket(): Promise<WebSocket> {
@@ -51,7 +53,7 @@ export default class ControlSocket {
         case WebSocket.CLOSING:
         case WebSocket.CLOSED:
         default:
-          throw new Error('Control socket not open');
+          throw new Error("Control socket not open");
       }
     }
 
@@ -70,19 +72,19 @@ export default class ControlSocket {
 
   private connect(): Promise<WebSocket> {
     return new Promise((resolve, reject) => {
-      logger.info('ControlSocket::connect()');
+      logger.info("ControlSocket::connect()");
 
       const socket = new WebSocket(SIGNALING_SERVER_WS_URL);
 
-      socket.addEventListener('open', () => {
+      socket.addEventListener("open", () => {
         resolve(socket);
       });
 
-      socket.addEventListener('error', () => {
+      socket.addEventListener("error", () => {
         reject();
       });
 
-      socket.addEventListener('message', (event) => {
+      socket.addEventListener("message", (event) => {
         this.handleMessage(event.data);
       });
     });
@@ -90,7 +92,7 @@ export default class ControlSocket {
 
   public close() {
     if (this.socket) {
-      logger.info('ControlSocket::close()');
+      logger.info("ControlSocket::close()");
       this.socket.close();
       delete this.socket;
     }
@@ -101,13 +103,13 @@ export default class ControlSocket {
     const message = JSON.parse(data);
     if (!message.id) {
       switch (message.method) {
-        case 'peerJoined':
-          logger.info('ControlSocket::handleMessage(): Peer joined');
+        case "peerJoined":
+          logger.info("ControlSocket::handleMessage(): Peer joined");
           const { clientId } = message.params;
           this.props.onPeerJoined(clientId);
           return;
-        case 'broadcast':
-          logger.info('ControlSocket::handleMessage(): Broadcast');
+        case "broadcast":
+          logger.info("ControlSocket::handleMessage(): Broadcast");
           this.props.onBroadcast(message.params);
           return;
         default:
@@ -150,12 +152,14 @@ export default class ControlSocket {
 
   public async authenticate() {
     const str = document.cookie.match(/session=([^;]+)/) || [];
-    const response = await this.request('authenticate', { token: str[1] || '' });
+    const response = await this.request("authenticate", {
+      token: str[1] || "",
+    });
     return this.handleAuthResponse(response);
   }
 
   private async getIceConfig(hostname: string): Promise<RTCIceServer[]> {
-    const result = await this.request('getIceConfig', { hostname });
+    const result = await this.request("getIceConfig", { hostname });
 
     if (!Array.isArray(result)) {
       throw new Error(`Invalid "getIceConfig" response: ${result}`);
@@ -165,22 +169,24 @@ export default class ControlSocket {
       urls,
       username: user || undefined,
       credential: pass || undefined,
-      credentialType: (user && pass) ? 'password' : undefined,
-    }))
+      credentialType: user && pass ? "password" : undefined,
+    }));
   }
 
   public async broadcast(type: string, data: object) {
-    const result = await this.request('broadcast', { params: { type, ...data } });
+    const result = await this.request("broadcast", {
+      params: { type, ...data },
+    });
     logger.info(`ControlSocket::broadcast(): response: ${result}`);
   }
 
   public async login(username: string) {
-    const response = await this.request('login', { username });
+    const response = await this.request("login", { username });
     return this.handleAuthResponse(response);
   }
 
   public async newSession(): Promise<string> {
-    const result = await this.request('newSession');
+    const result = await this.request("newSession");
 
     const session = parseSession(result);
     if (!session) {
@@ -194,21 +200,23 @@ export default class ControlSocket {
 
   public async joinSession(session: Session) {
     if (this.session) {
-      logger.info(`ControlSocket::joinSession(): Already joined session: ${this.session.id}`);
+      logger.info(
+        `ControlSocket::joinSession(): Already joined session: ${this.session.id}`,
+      );
       return;
     }
 
     const { id: sessionId, pin: sessionPin } = session;
-    await this.request('joinSession', { sessionId, sessionPin });
+    await this.request("joinSession", { sessionId, sessionPin });
 
     this.session = session;
     this.props.setSession(session);
   }
 
   public async leaveSession() {
-    const result = await this.request('leaveSession');
+    const result = await this.request("leaveSession");
 
-    if (result !== 'OK') {
+    if (result !== "OK") {
       throw new Error(`Invalid "leaveSession" response: ${result}`);
     }
 
@@ -217,13 +225,15 @@ export default class ControlSocket {
   }
 
   private handleAuthResponse(response: unknown): TokenData {
-    const hasStructure = Array.isArray(response) &&
+    const hasStructure =
+      Array.isArray(response) &&
       response.length === 2 &&
-      typeof response[0] === 'object' &&
-      typeof response[0].token_clientId === 'string' &&
-      (typeof response[0].token_user === 'string' || response[0].token_user === null) &&
-      typeof response[0].token_logins === 'number' &&
-      typeof response[1] === 'string';
+      typeof response[0] === "object" &&
+      typeof response[0].token_clientId === "string" &&
+      (typeof response[0].token_user === "string" ||
+        response[0].token_user === null) &&
+      typeof response[0].token_logins === "number" &&
+      typeof response[1] === "string";
 
     if (!hasStructure) {
       throw new Error(`Invalid "authorize" response: ${response}`);
@@ -244,9 +254,10 @@ export default class ControlSocket {
 }
 
 function parseSession(result: any): Session | null {
-  const hasStructure = typeof result === 'object' &&
-    typeof result.id === 'string' &&
-    typeof result.pin === 'string';
+  const hasStructure =
+    typeof result === "object" &&
+    typeof result.id === "string" &&
+    typeof result.pin === "string";
 
   if (!hasStructure) return null;
 

@@ -3,14 +3,14 @@ import { Link, useParams } from "react-router-dom";
 
 import { Item as IItem } from "../PeerConnection";
 import { getLogger } from "../Logger";
-import { Share as IShare } from '../share';
+import { Share as IShare } from "../share";
 
 import Pending from "./Pending";
 import Share from "./Share";
 import Error from "./Error";
 import { useConnectionState, useSession } from "./ConnectionManager";
 
-const logger = getLogger('Session');
+const logger = getLogger("Session");
 
 interface Props {
   shares: IShare[];

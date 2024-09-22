@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import * as uuid from 'uuid';
+import { useState } from "react";
+import * as uuid from "uuid";
 
 import { Item } from "./PeerConnection";
 
@@ -17,21 +17,21 @@ export function useShare() {
 
   return {
     addIncomingShare(share: Share) {
-      setShares(shares => shares.concat(share));
+      setShares((shares) => shares.concat(share));
     },
 
     onCopyItem(id: string) {
-      const share = shares.find(share => share.id === id);
+      const share = shares.find((share) => share.id === id);
       if (!share) return;
       navigator.clipboard.writeText(share.item.value);
     },
 
     onRemoteShareRemoved(id: string) {
-      setShares(shares => shares.filter(share => share.id !== id));
+      setShares((shares) => shares.filter((share) => share.id !== id));
     },
 
     onRemoveLocalShare(id: string) {
-      setShares(shares => shares.filter(share => share.id !== id));
+      setShares((shares) => shares.filter((share) => share.id !== id));
     },
 
     onResetLocalShares() {
@@ -40,8 +40,8 @@ export function useShare() {
 
     onShare(clientId: string, item: Item) {
       const id = uuid.v4();
-      const share: Share = { clientId, id, direction: 'outbound', item };
-      setShares(shares => shares.concat(share));
+      const share: Share = { clientId, id, direction: "outbound", item };
+      setShares((shares) => shares.concat(share));
       return share;
     },
 
