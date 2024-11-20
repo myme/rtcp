@@ -958,13 +958,13 @@ let
         sha512 = "wENBPt4ySzg4ybFQW2TT1zMQucPK95HSh/nq2CFTZVOGut2+pQvSsgtda4d26YrYcr067wjbmzOG8byDPBX63A==";
       };
     };
-    "rollup-3.29.4" = {
+    "rollup-3.29.5" = {
       name = "rollup";
       packageName = "rollup";
-      version = "3.29.4";
+      version = "3.29.5";
       src = fetchurl {
-        url = "https://registry.npmjs.org/rollup/-/rollup-3.29.4.tgz";
-        sha512 = "oWzmBZwvYrU0iJHtDmhsm662rC15FRXmcjCk1xD771dFDx5jJ02ufAQQTn0etB2emNk4J9EZg/yWKpsn9BWGRw==";
+        url = "https://registry.npmjs.org/rollup/-/rollup-3.29.5.tgz";
+        sha512 = "GVsDdsbJzzy4S/v3dqWPJ7EfvZJfCHiDqe80IyrF59LYuP+e6U1LJoUqeuqRbwAWoMNoXivMNeNAOf5E22VA1w==";
       };
     };
     "safe-buffer-5.1.2" = {
@@ -1048,13 +1048,13 @@ let
         sha512 = "+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==";
       };
     };
-    "vite-4.5.3" = {
+    "vite-4.5.5" = {
       name = "vite";
       packageName = "vite";
-      version = "4.5.3";
+      version = "4.5.5";
       src = fetchurl {
-        url = "https://registry.npmjs.org/vite/-/vite-4.5.3.tgz";
-        sha512 = "kQL23kMeX92v3ph7IauVkXkikdDRsYMGTVl5KY2E9OY4ONLvkHf04MDTbnfo6NKxZiDLWzVpP5oTa8hQD8U3dg==";
+        url = "https://registry.npmjs.org/vite/-/vite-4.5.5.tgz";
+        sha512 = "ifW3Lb2sMdX+WU91s3R0FyQlAyLxOzCSCP37ujw0+r5POeHPwe6udWVIElKQq8gk3t7b8rkmvqC6IHBpCff4GQ==";
       };
     };
   };
@@ -1170,7 +1170,7 @@ let
       sources."react-router-dom-6.2.1"
       sources."regenerator-runtime-0.13.9"
       sources."resolve-1.20.0"
-      sources."rollup-3.29.4"
+      sources."rollup-3.29.5"
       sources."safe-buffer-5.1.2"
       sources."scheduler-0.20.2"
       sources."semver-6.3.1"
@@ -1180,7 +1180,7 @@ let
       sources."to-fast-properties-2.0.0"
       sources."typescript-4.5.4"
       sources."uuid-8.3.2"
-      sources."vite-4.5.3"
+      sources."vite-4.5.5"
     ];
     buildInputs = globalBuildInputs;
     meta = {
