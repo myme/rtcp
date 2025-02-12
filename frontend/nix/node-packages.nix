@@ -823,13 +823,13 @@ let
         sha512 = "sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w==";
       };
     };
-    "nanoid-3.3.7" = {
+    "nanoid-3.3.8" = {
       name = "nanoid";
       packageName = "nanoid";
-      version = "3.3.7";
+      version = "3.3.8";
       src = fetchurl {
-        url = "https://registry.npmjs.org/nanoid/-/nanoid-3.3.7.tgz";
-        sha512 = "eSRppjcPIatRIMC1U6UngP8XFcz8MQWGQdt1MTBQ7NaAmvXDfvNxbvWV3x2y6CdEUciCSsDHDQZbhYaB8QEo2g==";
+        url = "https://registry.npmjs.org/nanoid/-/nanoid-3.3.8.tgz";
+        sha512 = "WNLf5Sd8oZxOm+TzppcYk8gVOgP+l58xNy58D0nbUnOxOWRWvlcCV4kUF7ltmI6PsrLl/BgKEyS4mqsGChFN0w==";
       };
     };
     "node-releases-2.0.1" = {
@@ -1048,13 +1048,13 @@ let
         sha512 = "+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==";
       };
     };
-    "vite-4.5.5" = {
+    "vite-4.5.9" = {
       name = "vite";
       packageName = "vite";
-      version = "4.5.5";
+      version = "4.5.9";
       src = fetchurl {
-        url = "https://registry.npmjs.org/vite/-/vite-4.5.5.tgz";
-        sha512 = "ifW3Lb2sMdX+WU91s3R0FyQlAyLxOzCSCP37ujw0+r5POeHPwe6udWVIElKQq8gk3t7b8rkmvqC6IHBpCff4GQ==";
+        url = "https://registry.npmjs.org/vite/-/vite-4.5.9.tgz";
+        sha512 = "qK9W4xjgD3gXbC0NmdNFFnVFLMWSNiR3swj957yutwzzN16xF/E7nmtAyp1rT9hviDroQANjE4HK3H4WqWdFtw==";
       };
     };
   };
@@ -1155,7 +1155,7 @@ let
       sources."json5-2.2.3"
       sources."loose-envify-1.4.0"
       sources."ms-2.1.2"
-      sources."nanoid-3.3.7"
+      sources."nanoid-3.3.8"
       sources."node-releases-2.0.1"
       sources."object-assign-4.1.1"
       sources."path-parse-1.0.7"
@@ -1180,7 +1180,7 @@ let
       sources."to-fast-properties-2.0.0"
       sources."typescript-4.5.4"
       sources."uuid-8.3.2"
-      sources."vite-4.5.5"
+      sources."vite-4.5.9"
     ];
     buildInputs = globalBuildInputs;
     meta = {
