@@ -25,7 +25,7 @@ jobs:
       - name: Build Docker image
         run: nix build -o ${{ env.tarball_name }}
       - name: Archive Docker Image
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: docker-image
           path: ${{ env.tarball_name }}
