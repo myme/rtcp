@@ -265,202 +265,202 @@ let
         sha512 = "dQjSq/7HaSjRM43FFGnv5keM2HsxpmyV1PfaSVm0nzzjwwTmjOe6J4bC8e3+pTEIgHaHj+1ZlLThRJ2auc/w1Q==";
       };
     };
-    "@esbuild/android-arm-0.18.16" = {
+    "@esbuild/android-arm-0.18.20" = {
       name = "_at_esbuild_slash_android-arm";
       packageName = "@esbuild/android-arm";
-      version = "0.18.16";
+      version = "0.18.20";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@esbuild/android-arm/-/android-arm-0.18.16.tgz";
-        sha512 = "gCHjjQmA8L0soklKbLKA6pgsLk1byULuHe94lkZDzcO3/Ta+bbeewJioEn1Fr7kgy9NWNFy/C+MrBwC6I/WCug==";
+        url = "https://registry.npmjs.org/@esbuild/android-arm/-/android-arm-0.18.20.tgz";
+        sha512 = "fyi7TDI/ijKKNZTUJAQqiG5T7YjJXgnzkURqmGj13C6dCqckZBLdl4h7bkhHt/t0WP+zO9/zwroDvANaOqO5Sw==";
       };
     };
-    "@esbuild/android-arm64-0.18.16" = {
+    "@esbuild/android-arm64-0.18.20" = {
       name = "_at_esbuild_slash_android-arm64";
       packageName = "@esbuild/android-arm64";
-      version = "0.18.16";
+      version = "0.18.20";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@esbuild/android-arm64/-/android-arm64-0.18.16.tgz";
-        sha512 = "wsCqSPqLz+6Ov+OM4EthU43DyYVVyfn15S4j1bJzylDpc1r1jZFFfJQNfDuT8SlgwuqpmpJXK4uPlHGw6ve7eA==";
+        url = "https://registry.npmjs.org/@esbuild/android-arm64/-/android-arm64-0.18.20.tgz";
+        sha512 = "Nz4rJcchGDtENV0eMKUNa6L12zz2zBDXuhj/Vjh18zGqB44Bi7MBMSXjgunJgjRhCmKOjnPuZp4Mb6OKqtMHLQ==";
       };
     };
-    "@esbuild/android-x64-0.18.16" = {
+    "@esbuild/android-x64-0.18.20" = {
       name = "_at_esbuild_slash_android-x64";
       packageName = "@esbuild/android-x64";
-      version = "0.18.16";
+      version = "0.18.20";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@esbuild/android-x64/-/android-x64-0.18.16.tgz";
-        sha512 = "ldsTXolyA3eTQ1//4DS+E15xl0H/3DTRJaRL0/0PgkqDsI0fV/FlOtD+h0u/AUJr+eOTlZv4aC9gvfppo3C4sw==";
+        url = "https://registry.npmjs.org/@esbuild/android-x64/-/android-x64-0.18.20.tgz";
+        sha512 = "8GDdlePJA8D6zlZYJV/jnrRAi6rOiNaCC/JclcXpB+KIuvfBN4owLtgzY2bsxnx666XjJx2kDPUmnTtR8qKQUg==";
       };
     };
-    "@esbuild/darwin-arm64-0.18.16" = {
+    "@esbuild/darwin-arm64-0.18.20" = {
       name = "_at_esbuild_slash_darwin-arm64";
       packageName = "@esbuild/darwin-arm64";
-      version = "0.18.16";
+      version = "0.18.20";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@esbuild/darwin-arm64/-/darwin-arm64-0.18.16.tgz";
-        sha512 = "aBxruWCII+OtluORR/KvisEw0ALuw/qDQWvkoosA+c/ngC/Kwk0lLaZ+B++LLS481/VdydB2u6tYpWxUfnLAIw==";
+        url = "https://registry.npmjs.org/@esbuild/darwin-arm64/-/darwin-arm64-0.18.20.tgz";
+        sha512 = "bxRHW5kHU38zS2lPTPOyuyTm+S+eobPUnTNkdJEfAddYgEcll4xkT8DB9d2008DtTbl7uJag2HuE5NZAZgnNEA==";
       };
     };
-    "@esbuild/darwin-x64-0.18.16" = {
+    "@esbuild/darwin-x64-0.18.20" = {
       name = "_at_esbuild_slash_darwin-x64";
       packageName = "@esbuild/darwin-x64";
-      version = "0.18.16";
+      version = "0.18.20";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@esbuild/darwin-x64/-/darwin-x64-0.18.16.tgz";
-        sha512 = "6w4Dbue280+rp3LnkgmriS1icOUZDyPuZo/9VsuMUTns7SYEiOaJ7Ca1cbhu9KVObAWfmdjUl4gwy9TIgiO5eA==";
+        url = "https://registry.npmjs.org/@esbuild/darwin-x64/-/darwin-x64-0.18.20.tgz";
+        sha512 = "pc5gxlMDxzm513qPGbCbDukOdsGtKhfxD1zJKXjCCcU7ju50O7MeAZ8c4krSJcOIJGFR+qx21yMMVYwiQvyTyQ==";
       };
     };
-    "@esbuild/freebsd-arm64-0.18.16" = {
+    "@esbuild/freebsd-arm64-0.18.20" = {
       name = "_at_esbuild_slash_freebsd-arm64";
       packageName = "@esbuild/freebsd-arm64";
-      version = "0.18.16";
+      version = "0.18.20";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@esbuild/freebsd-arm64/-/freebsd-arm64-0.18.16.tgz";
-        sha512 = "x35fCebhe9s979DGKbVAwXUOcTmCIE32AIqB9CB1GralMIvxdnMLAw5CnID17ipEw9/3MvDsusj/cspYt2ZLNQ==";
+        url = "https://registry.npmjs.org/@esbuild/freebsd-arm64/-/freebsd-arm64-0.18.20.tgz";
+        sha512 = "yqDQHy4QHevpMAaxhhIwYPMv1NECwOvIpGCZkECn8w2WFHXjEwrBn3CeNIYsibZ/iZEUemj++M26W3cNR5h+Tw==";
       };
     };
-    "@esbuild/freebsd-x64-0.18.16" = {
+    "@esbuild/freebsd-x64-0.18.20" = {
       name = "_at_esbuild_slash_freebsd-x64";
       packageName = "@esbuild/freebsd-x64";
-      version = "0.18.16";
+      version = "0.18.20";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@esbuild/freebsd-x64/-/freebsd-x64-0.18.16.tgz";
-        sha512 = "YM98f+PeNXF3GbxIJlUsj+McUWG1irguBHkszCIwfr3BXtXZsXo0vqybjUDFfu9a8Wr7uUD/YSmHib+EeGAFlg==";
+        url = "https://registry.npmjs.org/@esbuild/freebsd-x64/-/freebsd-x64-0.18.20.tgz";
+        sha512 = "tgWRPPuQsd3RmBZwarGVHZQvtzfEBOreNuxEMKFcd5DaDn2PbBxfwLcj4+aenoh7ctXcbXmOQIn8HI6mCSw5MQ==";
       };
     };
-    "@esbuild/linux-arm-0.18.16" = {
+    "@esbuild/linux-arm-0.18.20" = {
       name = "_at_esbuild_slash_linux-arm";
       packageName = "@esbuild/linux-arm";
-      version = "0.18.16";
+      version = "0.18.20";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@esbuild/linux-arm/-/linux-arm-0.18.16.tgz";
-        sha512 = "b5ABb+5Ha2C9JkeZXV+b+OruR1tJ33ePmv9ZwMeETSEKlmu/WJ45XTTG+l6a2KDsQtJJ66qo/hbSGBtk0XVLHw==";
+        url = "https://registry.npmjs.org/@esbuild/linux-arm/-/linux-arm-0.18.20.tgz";
+        sha512 = "/5bHkMWnq1EgKr1V+Ybz3s1hWXok7mDFUMQ4cG10AfW3wL02PSZi5kFpYKrptDsgb2WAJIvRcDm+qIvXf/apvg==";
       };
     };
-    "@esbuild/linux-arm64-0.18.16" = {
+    "@esbuild/linux-arm64-0.18.20" = {
       name = "_at_esbuild_slash_linux-arm64";
       packageName = "@esbuild/linux-arm64";
-      version = "0.18.16";
+      version = "0.18.20";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@esbuild/linux-arm64/-/linux-arm64-0.18.16.tgz";
-        sha512 = "XIqhNUxJiuy+zsR77+H5Z2f7s4YRlriSJKtvx99nJuG5ATuJPjmZ9n0ANgnGlPCpXGSReFpgcJ7O3SMtzIFeiQ==";
+        url = "https://registry.npmjs.org/@esbuild/linux-arm64/-/linux-arm64-0.18.20.tgz";
+        sha512 = "2YbscF+UL7SQAVIpnWvYwM+3LskyDmPhe31pE7/aoTMFKKzIc9lLbyGUpmmb8a8AixOL61sQ/mFh3jEjHYFvdA==";
       };
     };
-    "@esbuild/linux-ia32-0.18.16" = {
+    "@esbuild/linux-ia32-0.18.20" = {
       name = "_at_esbuild_slash_linux-ia32";
       packageName = "@esbuild/linux-ia32";
-      version = "0.18.16";
+      version = "0.18.20";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@esbuild/linux-ia32/-/linux-ia32-0.18.16.tgz";
-        sha512 = "no+pfEpwnRvIyH+txbBAWtjxPU9grslmTBfsmDndj7bnBmr55rOo/PfQmRfz7Qg9isswt1FP5hBbWb23fRWnow==";
+        url = "https://registry.npmjs.org/@esbuild/linux-ia32/-/linux-ia32-0.18.20.tgz";
+        sha512 = "P4etWwq6IsReT0E1KHU40bOnzMHoH73aXp96Fs8TIT6z9Hu8G6+0SHSw9i2isWrD2nbx2qo5yUqACgdfVGx7TA==";
       };
     };
-    "@esbuild/linux-loong64-0.18.16" = {
+    "@esbuild/linux-loong64-0.18.20" = {
       name = "_at_esbuild_slash_linux-loong64";
       packageName = "@esbuild/linux-loong64";
-      version = "0.18.16";
+      version = "0.18.20";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@esbuild/linux-loong64/-/linux-loong64-0.18.16.tgz";
-        sha512 = "Zbnczs9ZXjmo0oZSS0zbNlJbcwKXa/fcNhYQjahDs4Xg18UumpXG/lwM2lcSvHS3mTrRyCYZvJbmzYc4laRI1g==";
+        url = "https://registry.npmjs.org/@esbuild/linux-loong64/-/linux-loong64-0.18.20.tgz";
+        sha512 = "nXW8nqBTrOpDLPgPY9uV+/1DjxoQ7DoB2N8eocyq8I9XuqJ7BiAMDMf9n1xZM9TgW0J8zrquIb/A7s3BJv7rjg==";
       };
     };
-    "@esbuild/linux-mips64el-0.18.16" = {
+    "@esbuild/linux-mips64el-0.18.20" = {
       name = "_at_esbuild_slash_linux-mips64el";
       packageName = "@esbuild/linux-mips64el";
-      version = "0.18.16";
+      version = "0.18.20";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@esbuild/linux-mips64el/-/linux-mips64el-0.18.16.tgz";
-        sha512 = "YMF7hih1HVR/hQVa/ot4UVffc5ZlrzEb3k2ip0nZr1w6fnYypll9td2qcoMLvd3o8j3y6EbJM3MyIcXIVzXvQQ==";
+        url = "https://registry.npmjs.org/@esbuild/linux-mips64el/-/linux-mips64el-0.18.20.tgz";
+        sha512 = "d5NeaXZcHp8PzYy5VnXV3VSd2D328Zb+9dEq5HE6bw6+N86JVPExrA6O68OPwobntbNJ0pzCpUFZTo3w0GyetQ==";
       };
     };
-    "@esbuild/linux-ppc64-0.18.16" = {
+    "@esbuild/linux-ppc64-0.18.20" = {
       name = "_at_esbuild_slash_linux-ppc64";
       packageName = "@esbuild/linux-ppc64";
-      version = "0.18.16";
+      version = "0.18.20";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@esbuild/linux-ppc64/-/linux-ppc64-0.18.16.tgz";
-        sha512 = "Wkz++LZ29lDwUyTSEnzDaaP5OveOgTU69q9IyIw9WqLRxM4BjTBjz9un4G6TOvehWpf/J3gYVFN96TjGHrbcNQ==";
+        url = "https://registry.npmjs.org/@esbuild/linux-ppc64/-/linux-ppc64-0.18.20.tgz";
+        sha512 = "WHPyeScRNcmANnLQkq6AfyXRFr5D6N2sKgkFo2FqguP44Nw2eyDlbTdZwd9GYk98DZG9QItIiTlFLHJHjxP3FA==";
       };
     };
-    "@esbuild/linux-riscv64-0.18.16" = {
+    "@esbuild/linux-riscv64-0.18.20" = {
       name = "_at_esbuild_slash_linux-riscv64";
       packageName = "@esbuild/linux-riscv64";
-      version = "0.18.16";
+      version = "0.18.20";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@esbuild/linux-riscv64/-/linux-riscv64-0.18.16.tgz";
-        sha512 = "LFMKZ30tk78/mUv1ygvIP+568bwf4oN6reG/uczXnz6SvFn4e2QUFpUpZY9iSJT6Qpgstrhef/nMykIXZtZWGQ==";
+        url = "https://registry.npmjs.org/@esbuild/linux-riscv64/-/linux-riscv64-0.18.20.tgz";
+        sha512 = "WSxo6h5ecI5XH34KC7w5veNnKkju3zBRLEQNY7mv5mtBmrP/MjNBCAlsM2u5hDBlS3NGcTQpoBvRzqBcRtpq1A==";
       };
     };
-    "@esbuild/linux-s390x-0.18.16" = {
+    "@esbuild/linux-s390x-0.18.20" = {
       name = "_at_esbuild_slash_linux-s390x";
       packageName = "@esbuild/linux-s390x";
-      version = "0.18.16";
+      version = "0.18.20";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@esbuild/linux-s390x/-/linux-s390x-0.18.16.tgz";
-        sha512 = "3ZC0BgyYHYKfZo3AV2/66TD/I9tlSBaW7eWTEIkrQQKfJIifKMMttXl9FrAg+UT0SGYsCRLI35Gwdmm96vlOjg==";
+        url = "https://registry.npmjs.org/@esbuild/linux-s390x/-/linux-s390x-0.18.20.tgz";
+        sha512 = "+8231GMs3mAEth6Ja1iK0a1sQ3ohfcpzpRLH8uuc5/KVDFneH6jtAJLFGafpzpMRO6DzJ6AvXKze9LfFMrIHVQ==";
       };
     };
-    "@esbuild/linux-x64-0.18.16" = {
+    "@esbuild/linux-x64-0.18.20" = {
       name = "_at_esbuild_slash_linux-x64";
       packageName = "@esbuild/linux-x64";
-      version = "0.18.16";
+      version = "0.18.20";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@esbuild/linux-x64/-/linux-x64-0.18.16.tgz";
-        sha512 = "xu86B3647DihHJHv/wx3NCz2Dg1gjQ8bbf9cVYZzWKY+gsvxYmn/lnVlqDRazObc3UMwoHpUhNYaZset4X8IPA==";
+        url = "https://registry.npmjs.org/@esbuild/linux-x64/-/linux-x64-0.18.20.tgz";
+        sha512 = "UYqiqemphJcNsFEskc73jQ7B9jgwjWrSayxawS6UVFZGWrAAtkzjxSqnoclCXxWtfwLdzU+vTpcNYhpn43uP1w==";
       };
     };
-    "@esbuild/netbsd-x64-0.18.16" = {
+    "@esbuild/netbsd-x64-0.18.20" = {
       name = "_at_esbuild_slash_netbsd-x64";
       packageName = "@esbuild/netbsd-x64";
-      version = "0.18.16";
+      version = "0.18.20";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@esbuild/netbsd-x64/-/netbsd-x64-0.18.16.tgz";
-        sha512 = "uVAgpimx9Ffw3xowtg/7qQPwHFx94yCje+DoBx+LNm2ePDpQXHrzE+Sb0Si2VBObYz+LcRps15cq+95YM7gkUw==";
+        url = "https://registry.npmjs.org/@esbuild/netbsd-x64/-/netbsd-x64-0.18.20.tgz";
+        sha512 = "iO1c++VP6xUBUmltHZoMtCUdPlnPGdBom6IrO4gyKPFFVBKioIImVooR5I83nTew5UOYrk3gIJhbZh8X44y06A==";
       };
     };
-    "@esbuild/openbsd-x64-0.18.16" = {
+    "@esbuild/openbsd-x64-0.18.20" = {
       name = "_at_esbuild_slash_openbsd-x64";
       packageName = "@esbuild/openbsd-x64";
-      version = "0.18.16";
+      version = "0.18.20";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@esbuild/openbsd-x64/-/openbsd-x64-0.18.16.tgz";
-        sha512 = "6OjCQM9wf7z8/MBi6BOWaTL2AS/SZudsZtBziXMtNI8r/U41AxS9x7jn0ATOwVy08OotwkPqGRMkpPR2wcTJXA==";
+        url = "https://registry.npmjs.org/@esbuild/openbsd-x64/-/openbsd-x64-0.18.20.tgz";
+        sha512 = "e5e4YSsuQfX4cxcygw/UCPIEP6wbIL+se3sxPdCiMbFLBWu0eiZOJ7WoD+ptCLrmjZBK1Wk7I6D/I3NglUGOxg==";
       };
     };
-    "@esbuild/sunos-x64-0.18.16" = {
+    "@esbuild/sunos-x64-0.18.20" = {
       name = "_at_esbuild_slash_sunos-x64";
       packageName = "@esbuild/sunos-x64";
-      version = "0.18.16";
+      version = "0.18.20";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@esbuild/sunos-x64/-/sunos-x64-0.18.16.tgz";
-        sha512 = "ZoNkruFYJp9d1LbUYCh8awgQDvB9uOMZqlQ+gGEZR7v6C+N6u7vPr86c+Chih8niBR81Q/bHOSKGBK3brJyvkQ==";
+        url = "https://registry.npmjs.org/@esbuild/sunos-x64/-/sunos-x64-0.18.20.tgz";
+        sha512 = "kDbFRFp0YpTQVVrqUd5FTYmWo45zGaXe0X8E1G/LKFC0v8x0vWrhOWSLITcCn63lmZIxfOMXtCfti/RxN/0wnQ==";
       };
     };
-    "@esbuild/win32-arm64-0.18.16" = {
+    "@esbuild/win32-arm64-0.18.20" = {
       name = "_at_esbuild_slash_win32-arm64";
       packageName = "@esbuild/win32-arm64";
-      version = "0.18.16";
+      version = "0.18.20";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@esbuild/win32-arm64/-/win32-arm64-0.18.16.tgz";
-        sha512 = "+j4anzQ9hrs+iqO+/wa8UE6TVkKua1pXUb0XWFOx0FiAj6R9INJ+WE//1/Xo6FG1vB5EpH3ko+XcgwiDXTxcdw==";
+        url = "https://registry.npmjs.org/@esbuild/win32-arm64/-/win32-arm64-0.18.20.tgz";
+        sha512 = "ddYFR6ItYgoaq4v4JmQQaAI5s7npztfV4Ag6NrhiaW0RrnOXqBkgwZLofVTlq1daVTQNhtI5oieTvkRPfZrePg==";
       };
     };
-    "@esbuild/win32-ia32-0.18.16" = {
+    "@esbuild/win32-ia32-0.18.20" = {
       name = "_at_esbuild_slash_win32-ia32";
       packageName = "@esbuild/win32-ia32";
-      version = "0.18.16";
+      version = "0.18.20";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@esbuild/win32-ia32/-/win32-ia32-0.18.16.tgz";
-        sha512 = "5PFPmq3sSKTp9cT9dzvI67WNfRZGvEVctcZa1KGjDDu4n3H8k59Inbk0du1fz0KrAbKKNpJbdFXQMDUz7BG4rQ==";
+        url = "https://registry.npmjs.org/@esbuild/win32-ia32/-/win32-ia32-0.18.20.tgz";
+        sha512 = "Wv7QBi3ID/rROT08SABTS7eV4hX26sVduqDOTe1MvGMjNd3EjOz4b7zeexIR62GTIEKrfJXKL9LFxTYgkyeu7g==";
       };
     };
-    "@esbuild/win32-x64-0.18.16" = {
+    "@esbuild/win32-x64-0.18.20" = {
       name = "_at_esbuild_slash_win32-x64";
       packageName = "@esbuild/win32-x64";
-      version = "0.18.16";
+      version = "0.18.20";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@esbuild/win32-x64/-/win32-x64-0.18.16.tgz";
-        sha512 = "sCIVrrtcWN5Ua7jYXNG1xD199IalrbfV2+0k/2Zf2OyV2FtnQnMgdzgpRAbi4AWlKJj1jkX+M+fEGPQj6BQB4w==";
+        url = "https://registry.npmjs.org/@esbuild/win32-x64/-/win32-x64-0.18.20.tgz";
+        sha512 = "kTdfRcSiDfQca/y9QIkng02avJ+NCaQvrMejlsB3RRv5sE9rRoeBPISaZpKxHELzRxZyLvNts1P27W3wV+8geQ==";
       };
     };
     "@jridgewell/gen-mapping-0.3.3" = {
@@ -670,13 +670,13 @@ let
         sha512 = "Gzbf0wUtKfyPaqf0Plz+Ctinf9eQIzxEqBHwSvbGfeOm9GMNdLxyu1dNiCUfM+x6r4BE0xUJNh3Nmg9gfAtTmg==";
       };
     };
-    "esbuild-0.18.16" = {
+    "esbuild-0.18.20" = {
       name = "esbuild";
       packageName = "esbuild";
-      version = "0.18.16";
+      version = "0.18.20";
       src = fetchurl {
-        url = "https://registry.npmjs.org/esbuild/-/esbuild-0.18.16.tgz";
-        sha512 = "1xLsOXrDqwdHxyXb/x/SOyg59jpf/SH7YMvU5RNSU7z3TInaASNJWNFJ6iRvLvLETZMasF3d1DdZLg7sgRimRQ==";
+        url = "https://registry.npmjs.org/esbuild/-/esbuild-0.18.20.tgz";
+        sha512 = "ceqxoedUrcayh7Y7ZX6NdbbDzGROiyVBgC4PriJThBKSVPWnnFHZAkfI1lJT8QFkOwH4qOS2SJkS4wvpGl8BpA==";
       };
     };
     "escalade-3.1.1" = {
@@ -1093,28 +1093,28 @@ let
       sources."@babel/template-7.23.9"
       sources."@babel/traverse-7.23.9"
       sources."@babel/types-7.23.9"
-      sources."@esbuild/android-arm-0.18.16"
-      sources."@esbuild/android-arm64-0.18.16"
-      sources."@esbuild/android-x64-0.18.16"
-      sources."@esbuild/darwin-arm64-0.18.16"
-      sources."@esbuild/darwin-x64-0.18.16"
-      sources."@esbuild/freebsd-arm64-0.18.16"
-      sources."@esbuild/freebsd-x64-0.18.16"
-      sources."@esbuild/linux-arm-0.18.16"
-      sources."@esbuild/linux-arm64-0.18.16"
-      sources."@esbuild/linux-ia32-0.18.16"
-      sources."@esbuild/linux-loong64-0.18.16"
-      sources."@esbuild/linux-mips64el-0.18.16"
-      sources."@esbuild/linux-ppc64-0.18.16"
-      sources."@esbuild/linux-riscv64-0.18.16"
-      sources."@esbuild/linux-s390x-0.18.16"
-      sources."@esbuild/linux-x64-0.18.16"
-      sources."@esbuild/netbsd-x64-0.18.16"
-      sources."@esbuild/openbsd-x64-0.18.16"
-      sources."@esbuild/sunos-x64-0.18.16"
-      sources."@esbuild/win32-arm64-0.18.16"
-      sources."@esbuild/win32-ia32-0.18.16"
-      sources."@esbuild/win32-x64-0.18.16"
+      sources."@esbuild/android-arm-0.18.20"
+      sources."@esbuild/android-arm64-0.18.20"
+      sources."@esbuild/android-x64-0.18.20"
+      sources."@esbuild/darwin-arm64-0.18.20"
+      sources."@esbuild/darwin-x64-0.18.20"
+      sources."@esbuild/freebsd-arm64-0.18.20"
+      sources."@esbuild/freebsd-x64-0.18.20"
+      sources."@esbuild/linux-arm-0.18.20"
+      sources."@esbuild/linux-arm64-0.18.20"
+      sources."@esbuild/linux-ia32-0.18.20"
+      sources."@esbuild/linux-loong64-0.18.20"
+      sources."@esbuild/linux-mips64el-0.18.20"
+      sources."@esbuild/linux-ppc64-0.18.20"
+      sources."@esbuild/linux-riscv64-0.18.20"
+      sources."@esbuild/linux-s390x-0.18.20"
+      sources."@esbuild/linux-x64-0.18.20"
+      sources."@esbuild/netbsd-x64-0.18.20"
+      sources."@esbuild/openbsd-x64-0.18.20"
+      sources."@esbuild/sunos-x64-0.18.20"
+      sources."@esbuild/win32-arm64-0.18.20"
+      sources."@esbuild/win32-ia32-0.18.20"
+      sources."@esbuild/win32-x64-0.18.20"
       sources."@jridgewell/gen-mapping-0.3.3"
       sources."@jridgewell/resolve-uri-3.1.1"
       sources."@jridgewell/set-array-1.1.2"
@@ -1138,7 +1138,7 @@ let
       sources."csstype-3.0.10"
       sources."debug-4.3.3"
       sources."electron-to-chromium-1.4.28"
-      sources."esbuild-0.18.16"
+      sources."esbuild-0.18.20"
       sources."escalade-3.1.1"
       sources."escape-string-regexp-1.0.5"
       sources."estree-walker-2.0.2"
